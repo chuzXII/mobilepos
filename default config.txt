@@ -1,0 +1,19 @@
+// build gradle nodemodule rnecs pos
+    google()
+    jcenter { url "http://jcenter.bintray.com/" 
+    allowInsecureProtocol = true
+    }
+    maven { url "http://repo.spring.io/plugins-release/"
+    allowInsecureProtocol = true
+    }
+    jcenter { url "http://jcenter.bintray.com/" 
+    allowInsecureProtocol = true
+    }
+    maven { url "http://repo.spring.io/plugins-release/"
+    allowInsecureProtocol = true
+    }
+    // compile fileTree(dir: 'libs', include: ['*.jar'])
+
+//RNBluetoothManagerModule
+    import androidx.core.app.ActivityCompat;
+    import androidx.core.content.ContextCompat;

@@ -1,0 +1,2 @@
+# KasirEx
+# mobilepos

@@ -1,0 +1,33 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/InknutAntiqua-Regular.ttf",
+      "sha1": "535978767288d0a18d3a26d3bc2ed6f655c37ca2"
+    },
+    {
+      "path": "src/assets/fonts/Kadwa-Bold.ttf",
+      "sha1": "f8e23278c7d9779407852f9a934e8628d9f36c8f"
+    },
+    {
+      "path": "src/assets/fonts/Kadwa-Regular.ttf",
+      "sha1": "98245ddc92824b39a3a03cd82f93a8eafe118621"
+    },
+    {
+      "path": "src/assets/fonts/Khula-Regular.ttf",
+      "sha1": "bd1f7dd4207bb0e2c23cdc4e3317528fb54d8e5c"
+    },
+    {
+      "path": "src/assets/fonts/TitilliumWeb-Bold.ttf",
+      "sha1": "338a89991f9244d6392b647be9632e97fc285eb7"
+    },
+    {
+      "path": "src/assets/fonts/TitilliumWeb-Light.ttf",
+      "sha1": "51ec3675bb54e357ab24eb88b53d596035d1eccd"
+    },
+    {
+      "path": "src/assets/fonts/TitilliumWeb-Regular.ttf",
+      "sha1": "d865b839ba95b93d11458f1ac530013965dd52ac"
+    }
+  ]
+}
