@@ -15,52 +15,63 @@ const Splashscreen = ({ navigation }) => {
 
   const get = async () => {
     try {
-      await GoogleSignin.configure({
-        scopes: ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive.file']
-      })
-      const cek = await AsyncStorage.getItem('tokenAccess')
-      const cekspreadsheet = await AsyncStorage.getItem('TokenSheet')
-      const isSignedIn = await GoogleSignin.isSignedIn()
-      await GoogleSignin.hasPlayServices();
-      await GoogleSignin.signIn()
-      const res = await GoogleSignin.getTokens()
-      console.log(res)
-      await AsyncStorage.setItem('tokenAccess', res.accessToken)
-      const user = await GoogleSignin.getCurrentUser()
-      await AsyncStorage.setItem('usergooglesignin', JSON.stringify(user.user))
+      // await GoogleSignin.configure({
+      //   scopes: ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive.file']
+      // })
+      // const cek = await AsyncStorage.getItem('tokenAccess')
+      // const cekspreadsheet = await AsyncStorage.getItem('TokenSheet')
+      // const isSignedIn = await GoogleSignin.isSignedIn()
+      // await GoogleSignin.hasPlayServices();
+      // await GoogleSignin.signIn()
+      // const res = await GoogleSignin.getTokens()
+      // console.log(res)
+      // await AsyncStorage.setItem('tokenAccess', res.accessToken)
+      // const user = await GoogleSignin.getCurrentUser()
+      // await AsyncStorage.setItem('usergooglesignin', JSON.stringify(user.user))
+      const ceklog = await AsyncStorage.getItem('islog')
 
       const address = await AsyncStorage.getItem('bltaddress');
       if (address != null || address != '') {
         Activasionblt(address)
       }
-      if (cekspreadsheet) {
+      if (ceklog) {
         setTimeout(() => {
           navigation.replace('Routestack')
         }, 2000)
       }
       else {
         setTimeout(() => {
-          navigation.replace('GuidePage')
+          navigation.replace('loginpage')
         }, 2000)
       }
+      // if (cekspreadsheet) {
+      //   setTimeout(() => {
+      //     navigation.replace('Routestack')
+      //   }, 2000)
+      // }
+      // else {
+      //   setTimeout(() => {
+      //     navigation.replace('GuidePage')
+      //   }, 2000)
+      // }
     } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        RNRestart.Restart()
-      } else if (error.code === statusCodes.SIGN_IN_REQUIRED) {
-        await GoogleSignin.signIn()
-      }
-      else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log('sign progress')
-      }
-      else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log('play services not available or outdated')
-        // play services not available or outdated
-      }
-      else {
-        RNRestart.Restart()
-        console.log(error)
-        console.log(error.code)
-      }
+      // if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      //   RNRestart.Restart()
+      // } else if (error.code === statusCodes.SIGN_IN_REQUIRED) {
+      //   await GoogleSignin.signIn()
+      // }
+      // else if (error.code === statusCodes.IN_PROGRESS) {
+      //   console.log('sign progress')
+      // }
+      // else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      //   console.log('play services not available or outdated')
+      //   // play services not available or outdated
+      // }
+      // else {
+      //   RNRestart.Restart()
+      //   console.log(error)
+      //   console.log(error.code)
+      // }
     }
   }
   const Permassion = async () => {

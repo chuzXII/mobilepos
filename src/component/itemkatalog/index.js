@@ -14,8 +14,8 @@ const ItemKatalog = ({item, ...res}) => {
       }}
       {...res}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        {item[5] == undefined ? (
-          item[1].split(' ').length <= 1 ? (
+        {item.imageUrl == undefined ? (
+          item.nama_produk.split(' ').length <= 1 ? (
             <View
               style={{
                 borderBottomLeftRadius: 6,
@@ -27,9 +27,9 @@ const ItemKatalog = ({item, ...res}) => {
                 justifyContent: 'center',
               }}>
               <Text
-                style={{fontSize: 32, fontWeight: 'bold', color: '#151515'}}>
-                {item[1].slice(0, 1).toUpperCase() +
-                  item[1].slice(1, 2).toUpperCase()}
+                style={{fontSize: 32, fontWeight: 'bold', color: '#ededed'}}>
+                {item.nama_produk.slice(0, 1).toUpperCase() +
+                  item.nama_produk.slice(1, 2).toUpperCase()}
               </Text>
             </View>
           ) : (
@@ -45,26 +45,30 @@ const ItemKatalog = ({item, ...res}) => {
               }}>
               <Text
                 style={{fontSize: 32, fontWeight: 'bold', color: '#151515'}}>
-                {item[1].split(' ')[0].slice(0, 1).toUpperCase() +
-                  item[1].split(' ')[1].slice(0, 1).toUpperCase()}
+                {item.nama_produk.split(' ')[0].slice(0, 1).toUpperCase() +
+                  item.nama_produk.split(' ')[1].slice(0, 1).toUpperCase()}
               </Text>
             </View>
           )
         ) : (
-          <Image source={{uri: item[5]}} style={styles.image}></Image>
+          <Image source={{uri: item.imageUrl}} style={styles.image}></Image>
         )}
         <View style={{flex: 5, marginLeft: 12}}>
           <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Bold'}}>
-            {item[1]}
+            {item.nama_produk}
           </Text>
           <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
-            Kategori : {item[3]}
+            Kategori : {item.kategori.nama_kategori}
           </Text>
+          {item.stok>0?<Text style={{color: '#000', fontFamily: 'TitilliumWeb-Light'}}>
+            stok : {item.stok}
+          </Text>:<View></View>}
+          
         </View>
 
         <View style={{marginRight: 12}}>
           <Text style={{color: '#000', fontFamily: 'TitilliumWeb-Regular'}}>
-            Rp.{item[2]}
+            Rp.{item.harga}
           </Text>
         </View>
       </View>

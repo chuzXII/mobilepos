@@ -5,22 +5,22 @@ const initialStateidtrx = {
     id_produk: null,
 }
 const TRXReducer = (state = initialStateidtrx, action) => {
-    if(action.type=="RMIDPRODUK"){
-        return{
-            id_produk:action.value
+    if (action.type == "RMIDPRODUK") {
+        return {
+            id_produk: action.value
         }
     }
-    if(action.type=="IDPRODUK"){
-        if(state.id_produk == null){
-            return{
-                id_produk:action.value
+    if (action.type == "IDPRODUK") {
+        if (state.id_produk == null) {
+            return {
+                id_produk: action.value
             }
         }
-        else{
-            return{
-                id_produk:state.id_produk
+        else {
+            return {
+                id_produk: state.id_produk
             }
-        } 
+        }
     }
     return state
 }
@@ -30,22 +30,22 @@ const initialStateDiskon = {
 
 }
 const DiskonReducer = (state = initialStateDiskon, action) => {
-    if(action.type=="DISKON"){
-            return{
-                nama_diskon:action.valuenama,
-                diskon:action.valuediskon
-            }
+    if (action.type == "DISKON") {
+        return {
+            nama_diskon: action.valuenama,
+            diskon: action.valuediskon
+        }
     }
     return state
 }
-const initialStateTunai= {
+const initialStateTunai = {
     nominal: null,
 }
 const TunaiReducer = (state = initialStateTunai, action) => {
-    if(action.type=="NOMINAL"){
-            return{
-                nominal:action.value
-            }
+    if (action.type == "NOMINAL") {
+        return {
+            nominal: action.value
+        }
     }
     return state
 }
@@ -53,7 +53,7 @@ const initialStateCart = {
     cartitem: [],
 }
 const CartReducer = (state = initialStateCart, action) => {
-    
+
     if (action.type == 'CART') {
         const isInCart = state.cartitem.some(item => item.id === action.value.id);
 
@@ -64,13 +64,13 @@ const CartReducer = (state = initialStateCart, action) => {
                     item => item.id === action.value.id ? {
                         ...item,
                         count: item.count + 1
-                    } :item
+                    } : item
                 )
             }
         }
         return {
             ...state,
-            cartitem: [...state.cartitem,action.value]
+            cartitem: [...state.cartitem, action.value]
         }
     }
     if (action.type == 'INCREMENT') {
@@ -80,43 +80,43 @@ const CartReducer = (state = initialStateCart, action) => {
                 item => item.id === action.value.id ? {
                     ...item,
                     count: item.count + 1
-                } :item
+                } : item
             )
         }
     }
     if (action.type == 'DECREMENT') {
-        const item = state.cartitem.find(item=>item.id===action.value.id)
-        if(item?.count === 1){
+        const item = state.cartitem.find(item => item.id === action.value.id)
+        if (item?.count === 1) {
             return {
                 ...state,
                 cartitem: state.cartitem.filter(item => item.id !== action.value.id),
-              };
+            };
         }
         return {
             ...state,
             cartitem: state.cartitem.map(
-              item => item.id === action.value.id
-                ? {
-                  ...item,
-                  count: item.count - 1
-                }
-                :item
+                item => item.id === action.value.id
+                    ? {
+                        ...item,
+                        count: item.count - 1
+                    }
+                    : item
             ),
-          };
+        };
     }
-    if(action.type == "REMOVE"){
+    if (action.type == "REMOVE") {
         return {
             ...state,
             cartitem: state.cartitem.filter(
-              (item) => item.id !== action.value.id
+                (item) => item.id !== action.value.id
             ),
-          };
+        };
     }
-    if(action.type == "REMOVEALL"){
+    if (action.type == "REMOVEALL") {
         return {
             ...state,
             cartitem: []
-          };
+        };
     }
     return state
 }
@@ -127,7 +127,9 @@ const inistialStateForm = {
         namaproduk: null,
         hargaproduk: null,
         kategoriproduk: null,
-        barcodeproduk: null
+        stokproduk: null,
+        idkategori:0,
+        namakategori:null
     },
 }
 
@@ -141,29 +143,59 @@ const FormReducer = (state = inistialStateForm, action) => {
             }
         }
     }
-    if(action.type === 'RM_FORM'){
+    if (action.type === 'RM_FORM') {
         return {
             form: {
                 namaproduk: null,
                 hargaproduk: null,
                 kategoriproduk: null,
-                barcodeproduk: null
+                stokproduk: null,
+                idkategori:0,
+                namakategori:null
             }
         }
     }
     return state
 }
 const inistialStateCek = {
-   cek:false,
-   code:"ssd"
+    cek: false,
+    code: "ssd"
 
 }
 const cekReducer = (state = inistialStateCek, action) => {
     if (action.type === 'SET_CEK') {
-        return{
+        return {
             ...state,
-             cek:action.value,
-             code:action.code
+            cek: action.value,
+            code: action.code
+        }
+    }
+    return state
+}
+
+const inistialStateFormToko = {
+    form: {
+        namatoko: null,
+        alamattoko: null
+    },
+}
+
+const FormTokoReducer = (state = inistialStateFormToko, action) => {
+    if (action.type === 'SET_FORM') {
+        return {
+            ...state,
+            form: {
+                ...state.form,
+                [action.inputType]: action.inputValue
+            }
+        }
+    }
+    if (action.type === 'RM_FORM') {
+        return {
+            form: {
+                namatoko: null,
+                alamattoko: null
+            }
         }
     }
     return state
@@ -176,7 +208,8 @@ const reducer = combineReducers({
     cekReducer,
     TRXReducer,
     TunaiReducer,
-    DiskonReducer
+    DiskonReducer,
+    FormTokoReducer
 
 });
 

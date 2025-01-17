@@ -62,7 +62,6 @@ const HistoryPage = () => {
               <Text
                 style={{
                   color: '#000',
-
                   fontFamily: 'TitilliumWeb-Bold',
                 }}>
                 Rp.

@@ -16,66 +16,95 @@ import { emptyproduct } from '../../assets/image';
 import { FlashList } from '@shopify/flash-list';
 import { TextInput } from 'react-native-gesture-handler';
 import { Ifilter } from '../../assets/icon';
+import BASE_URL from '../../../config';
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 
-const ListKatalog = ({ navigation }) => {
+const ListKatalog = ({ route,navigation }) => {
+  const params = route.params.data
   const [Data, setData] = useState([]);
   const [DumyData, setDumyData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
+  const [Datakateogri, setDatakateogri] = useState([]);
 
-  const datacategory = [
-    { id: 1, category: 'All' },
-    { id: 2, category: 'Mod' },
-    { id: 3, category: 'Pod' },
-    { id: 4, category: 'Accecories' },
-    { id: 5, category: 'Authomizer' },
-    { id: 6, category: 'Freebase' },
-    { id: 7, category: 'Saltnic' },
-  ];
   const renderitem = (item) => {
     return (
       <View style={{ marginTop: 18, paddingBottom: 2 }}>
         <ItemKatalog
           item={item.item}
           onPress={() =>
-            navigation.navigate('formedit', { id: item.item[0], data: item.item })
+            navigation.navigate('formedit', { id: item.item.kode_produk, data: item.item })
           }
+          onLongPress={()=>onPressdelete(item.item)}
         />
       </View>
     );
   };
+  const onPressdelete = (item) => {
 
+    Dialog.show({
+        type: ALERT_TYPE.CONFIRM,
+        title: 'Konfirmasi',
+        textBody: 'Apakah Anda yakin ingin melanjutkan?',
+        autoClose: false,
+        onPressYes: async () => {
+            try {
+                const token = await AsyncStorage.getItem('tokenAccess');
+                await axios.delete(`${BASE_URL}/produk/${item.kode_produk}`,
+                    {
+                        headers: {
+                            Authorization: 'Bearer ' + token,
+                        },
+                    },
+                )
+            } catch (error) {
+                console.log(error.response)
+            }
+        },
+        // Aksi saat tombol "Tidak" ditekan
+        onPressNo: () => {
+            console.log('Pengguna membatalkan penghapusan!');
+        },
+    })
+    // return(AlertComfirm())
+}
   const get = async () => {
+
     try {
-      const sheetid = await AsyncStorage.getItem('TokenSheet');
+      // setModalVisibleLoading(true);
       const token = await AsyncStorage.getItem('tokenAccess');
-      await axios
-        .get(
-          'https://sheets.googleapis.com/v4/spreadsheets/' +
-          sheetid +
-          '/values/Produk',
-          {
-            headers: {
-              Authorization: 'Bearer ' + token,
-            },
-          },
-        )
-        .then(res => {
-          if (res.data.values == undefined) {
-            setData([]);
-            setRefreshing(false);
-
-          }
-          else {
-            setData(res.data.values);
-            setDumyData(res.data.values)
-            setRefreshing(false);
-          }
-
-        });
+      const [res1, res2] = await Promise.all([
+        axios.get(`${BASE_URL}/produk/${params.data.id_toko}/false`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+        axios.get(`${BASE_URL}/kategori`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+      ]);
+      console.log(res1.data.data)
+      setData(res1.data.data);
+      setDatakateogri(res2.data.data)
+      setDumyData(res1.data.data)
+      // setLengthData(res1.data.data.length)
+      setRefreshing(false);
+      // setModalVisibleLoading(false);
     } catch (error) {
-      console.log(error);
-    }
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+        alert(error.message);
+        setRefreshing(false);
+      } else if (error.request) {
+        console.log(error.request);
+        alert(error.message);
+        setRefreshing(false);
+      } else {
+        console.log('Error', error.message);
+        alert(error.message);
+        setRefreshing(false);
+      }
+    };
   };
   const Filter = (textinput, category) => {
     if (textinput == null) {
@@ -84,9 +113,8 @@ const ListKatalog = ({ navigation }) => {
         setModalVisibleCategory(!modalVisibleCategory)
       }
       else {
-        const a = DumyData.filter(fill => fill[3] != null ? fill[3].toLowerCase() == category.toLowerCase() : null)
+        const a = DumyData.filter(fill => fill.kategori.nama_kategori != null ? fill.kategori.nama_kategori.toLowerCase() == category.toLowerCase() : null)
         setData(a)
-        // console.log(a)
         setModalVisibleCategory(!modalVisibleCategory)
       }
     }
@@ -154,7 +182,7 @@ const ListKatalog = ({ navigation }) => {
 
       <TouchableOpacity
         style={{ backgroundColor: '#151B25', padding: 18, alignItems: 'center' }}
-        onPress={() => navigation.navigate('formkasir', { barcodes: null })}>
+        onPress={() => navigation.navigate('formkasir', { data: params.data })}>
         <Text style={{ color: '#fff', fontSize: 18, fontWeight: '500' }}>
           Tambah Katalog
         </Text>
@@ -187,14 +215,21 @@ const ListKatalog = ({ navigation }) => {
                 Category
               </Text>
               <ScrollView style={{ flex: 1, marginBottom: 42 }}>
-                {datacategory.map((item, i) => {
+                <TouchableOpacity
+                  style={styles.btnitemcategory}
+                  onPress={() => Filter(null, "all")}>
+                  <Text style={{ color: '#000', textAlign: 'center' }}>
+                    all
+                  </Text>
+                </TouchableOpacity>
+                {Datakateogri.map((item, i) => {
                   return (
                     <TouchableOpacity
                       key={i}
                       style={styles.btnitemcategory}
-                      onPress={() => Filter(null, item.category)}>
+                      onPress={() => Filter(null, item.nama_kategori)}>
                       <Text style={{ color: '#000', textAlign: 'center' }}>
-                        {item.category}
+                        {item.nama_kategori}
                       </Text>
                     </TouchableOpacity>
                   );

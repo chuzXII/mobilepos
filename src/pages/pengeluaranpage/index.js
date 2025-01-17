@@ -51,7 +51,6 @@ import axios from 'axios';
             Authorization: 'Bearer ' + token,
           },
         },).then(()=>{
-          ToastAndroid.show('Berhasil', ToastAndroid.SHORT)
           setForm({
             namabarang:'',
             hargabarang:'',

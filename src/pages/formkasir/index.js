@@ -17,8 +17,10 @@ import { setForm } from '../../redux/action';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Iscan, Iscand } from '../../assets/icon';
+import BASE_URL from '../../../config';
 
 const Formkasir = ({ route }) => {
+  const params =route.params.data;
   const navigation = useNavigation();
   // const { barcodes } = route.params;
   const FormReducer = useSelector(state => state.FormReducer);
@@ -26,70 +28,72 @@ const Formkasir = ({ route }) => {
   const [ID, setid] = useState(0);
   const [Check, setCheck] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
-
-  const datacategory = [
-    { id: 1, category: 'Mod' },
-    { id: 2, category: 'Pod' },
-    { id: 3, category: 'Accecories' },
-    { id: 4, category: 'Authomizer' },
-    { id: 5, category: 'Freebase' },
-    { id: 6, category: 'Saltnic' },
-  ];
-  const handleBackButtonClick=() =>{
+  const [Datakateogri, setDatakateogri] = useState([]);
+  const [errors, setErrors] = useState({});
+  const handleBackButtonClick = () => {
     navigation.goBack();
     dispatch({ type: 'RM_FORM' });
     return true;
   }
   const get = async () => {
-    const sheetid = await AsyncStorage.getItem('TokenSheet');
     const token = await AsyncStorage.getItem('tokenAccess');
-    axios.get('https://sheets.googleapis.com/v4/spreadsheets/' +
-      sheetid + '/values/Produk',
+    await axios.get(`${BASE_URL}` + '/kategori',
       {
         headers: {
           Authorization: 'Bearer ' + token,
         },
-      },).then((res) => {
-        if (res.data.values == undefined) {
-          setid(0)
-        }
-        else {
-          setid(res.data.values.splice(res.data.values.length - 1)[0][0])
+      },
+    ).then(res => {
+      setDatakateogri(res.data.data)
+    })
 
-        }
-      })
+  };
+  const openModalkategori = (item) => {
+
+    onInputChange(item.kode_kategori, 'idkategori')
+    onInputChange(item.nama_kategori, 'kategoriproduk')
+    setModalVisibleCategory(!modalVisibleCategory)
   }
-  const openModalkategori=(item)=>{
-    onInputChange(item.category, 'kategoriproduk')
-    setModalVisibleCategory(!modalVisibleCategory) 
-  }
-  const closeModal=()=>{
+  const closeModal = () => {
     setModalVisibleCategory(!modalVisibleCategory)
     onInputChange(null, 'kategoriproduk')
   }
   const onPress = async () => {
+
     try {
       const sheetid = await AsyncStorage.getItem('TokenSheet');
       const token = await AsyncStorage.getItem('tokenAccess');
-      const data = [[parseInt(ID) + 1, FormReducer.form.namaproduk, FormReducer.form.hargaproduk, FormReducer.form.kategoriproduk.toUpperCase(),FormReducer.form.barcodeproduk]]
+      const response = await axios.post(`${BASE_URL}` + '/produk', {
+        id_toko:params.id_toko,
+        nama_produk: FormReducer.form.namaproduk,
+        harga: FormReducer.form.hargaproduk,
+        stok: FormReducer.form.stokproduk,
+        kode_kategori: FormReducer.form.idkategori,
+        is_stock_managed :FormReducer.form.stokproduk > 0 ? 1 : 0,
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
 
-      axios.post('https://sheets.googleapis.com/v4/spreadsheets/' +
-        sheetid +
-        '/values/Produk!A1:append?valueInputOption=USER_ENTERED', JSON.stringify({
-          values: data,
-        }),
-        {
-          headers: {
-            'Content-type': 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
-        },).then(() => {
-          dispatch({ type: 'RM_FORM' })
-          navigation.navigate('dashboard');
-          setCheck(!Check)
-        })
-    } catch (e) {
-      console.log('EE' + e);
+      if (response.data.status === 'success') {
+        dispatch({ type: 'RM_FORM' })
+        navigation.goBack();
+        setCheck(!Check)
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 422) {
+        // Display validation errors from the server
+        const validationErrors = error.response.data.errors;
+        setErrors(validationErrors);
+        console.error('Error:', validationErrors);
+      } else if (error.response && error.response.status === 401) {
+        setErrors({ general: 'Invalid credentials' });
+        console.error('Error:', error.message);
+      } else {
+        alert('An unexpected error occurred. Please try again.');
+        console.error('Error:', error.message);
+      }
+    } finally {
+      // setLoading(false);
     }
   };
   const onInputChange = (value, input) => {
@@ -133,9 +137,17 @@ const Formkasir = ({ route }) => {
 
               />
             </View>
+            <Label label={'Stok Produk'} />
+            <View style={styles.formgroup}>
+              <Input
+                input={'Stok Produk'}
+                numberOfLines={1}
+                value={FormReducer.form.stokproduk}
+                onChangeText={value => onInputChange(value, 'stokproduk')}
+                keyboardType={'number-pad'}
 
-
-
+              />
+            </View>
             <Label label={'Kategori Produk'} />
             <TouchableOpacity
               style={{
@@ -153,7 +165,7 @@ const Formkasir = ({ route }) => {
                   .replace(/\s+$/, '') == '' ? "kategori Produk" : FormReducer.form.kategoriproduk}</Text>
             </TouchableOpacity>
 
-            <Label label={'Kode Barcode'} />
+            {/* <Label label={'Kode Barcode'} />
             <View style={styles.formgroup}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Input
@@ -163,14 +175,14 @@ const Formkasir = ({ route }) => {
                   onChangeText={value => onInputChange(value, 'barcodeproduk')}
                   keyboardType={'number-pad'}
                   icon={true}
-                  style={{ flex: 1 ,color:'#000'}}
+                  style={{ flex: 1, color: '#000' }}
                 />
                 <TouchableOpacity style={{ marginRight: 12 }} onPress={() => navigation.navigate('camscan', false)}>
                   <Iscand />
                 </TouchableOpacity>
               </View>
 
-            </View>
+            </View> */}
 
 
 
@@ -224,7 +236,7 @@ const Formkasir = ({ route }) => {
             style={{
               backgroundColor: '#fff',
               width: DWidth / 1.2,
-              height: DHeight / 2.5,
+              height: DHeight / 3.5,
               borderRadius: 12,
 
             }}>
@@ -240,18 +252,23 @@ const Formkasir = ({ route }) => {
                 Category
               </Text>
               <ScrollView style={{ flex: 1, marginBottom: 42 }}>
-                {datacategory.map((item, i) => {
-                  return (
+                {Datakateogri && Datakateogri.length > 0 ? (
+                  Datakateogri.map((item, i) => (
                     <TouchableOpacity
                       key={i}
                       style={styles.btnitemcategory}
-                      onPress={() => {openModalkategori(item)}}>
+                      onPress={() => { openModalkategori(item); }}>
                       <Text style={{ color: '#000', textAlign: 'center' }}>
-                        {item.category}
+                        {item.nama_kategori}
                       </Text>
                     </TouchableOpacity>
-                  );
-                })}
+                  ))
+                ) : (
+                  <Text style={{ color: '#000', textAlign: 'center' }}>
+                    Tidak Ada Data Kategori
+                  </Text>
+                )}
+
               </ScrollView>
             </View>
           </View>

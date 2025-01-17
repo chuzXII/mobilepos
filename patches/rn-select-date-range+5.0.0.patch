@@ -1,0 +1,365 @@
+diff --git a/node_modules/rn-select-date-range/lib/cjs/Button.d.ts b/node_modules/rn-select-date-range/lib/cjs/Button.d.ts
+index c759373..cc017f5 100644
+--- a/node_modules/rn-select-date-range/lib/cjs/Button.d.ts
++++ b/node_modules/rn-select-date-range/lib/cjs/Button.d.ts
+@@ -1,4 +1,3 @@
+-/// <reference types="react" />
+ interface IProps {
+     label: string;
+     onPress: () => void;
+diff --git a/node_modules/rn-select-date-range/lib/cjs/Button.js b/node_modules/rn-select-date-range/lib/cjs/Button.js
+index b0a48f3..623ff00 100644
+--- a/node_modules/rn-select-date-range/lib/cjs/Button.js
++++ b/node_modules/rn-select-date-range/lib/cjs/Button.js
+@@ -11,6 +11,7 @@ exports.default = (function (_a) {
+         textAlign: align,
+         opacity: disabled ? 0.2 : 1,
+         fontFamily: font,
++        color:'#fff',
+     };
+     return (react_1.default.createElement(react_native_1.TouchableOpacity, { disabled: disabled, style: styles.buttonContainer, onPress: function () { return onPress(); } },
+         react_1.default.createElement(react_native_1.Text, { style: textStyle }, label)));
+diff --git a/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.d.ts b/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.d.ts
+index 0437c0a..7d02f47 100644
+--- a/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.d.ts
++++ b/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.d.ts
+@@ -1,4 +1,3 @@
+-/// <reference types="react" />
+ import { ViewStyle, TextStyle } from "react-native";
+ import moment from "moment";
+ interface IResponse {
+diff --git a/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.js b/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.js
+index a60aeca..0334b38 100644
+--- a/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.js
++++ b/node_modules/rn-select-date-range/lib/cjs/DateRangePicker.js
+@@ -1,4 +1,6 @@
+ "use strict";
++import moment from 'moment';
++
+ var __assign = (this && this.__assign) || function () {
+     __assign = Object.assign || function(t) {
+         for (var s, i = 1, n = arguments.length; i < n; i++) {
+@@ -12,11 +14,7 @@ var __assign = (this && this.__assign) || function () {
+ };
+ var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+-    var desc = Object.getOwnPropertyDescriptor(m, k);
+-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+-      desc = { enumerable: true, get: function() { return m[k]; } };
+-    }
+-    Object.defineProperty(o, k2, desc);
++    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+ }) : (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+     o[k2] = m[k];
+@@ -44,10 +42,10 @@ var Month_1 = __importDefault(require("./Month"));
+ var Button_1 = __importDefault(require("./Button"));
+ require("moment/min/locales.min");
+ var DateRangePicker = function (_a) {
+-    var onSelectDateRange = _a.onSelectDateRange, responseFormat = _a.responseFormat, maxDate = _a.maxDate, minDate = _a.minDate, blockSingleDateSelection = _a.blockSingleDateSelection, font = _a.font, selectedDateContainerStyle = _a.selectedDateContainerStyle, selectedDateStyle = _a.selectedDateStyle, _b = _a.ln, ln = _b === void 0 ? "en" : _b, onConfirm = _a.onConfirm, onClear = _a.onClear, _c = _a.clearBtnTitle, clearBtnTitle = _c === void 0 ? "Clear" : _c, _d = _a.confirmBtnTitle, confirmBtnTitle = _d === void 0 ? "OK" : _d;
+-    var _e = (0, react_1.useState)((0, moment_1.default)()), selectedDate = _e[0], setSelectedDate = _e[1];
+-    var _f = (0, react_1.useState)(null), firstDate = _f[0], setFirstDate = _f[1];
+-    var _g = (0, react_1.useState)(null), secondDate = _g[0], setSecondDate = _g[1];
++    var onSelectDateRange = _a.onSelectDateRange, responseFormat = _a.responseFormat, maxDate = _a.maxDate, minDate = _a.minDate, blockSingleDateSelection = _a.blockSingleDateSelection, font = _a.font, selectedDateContainerStyle = _a.selectedDateContainerStyle, selectedDateStyle = _a.selectedDateStyle, _b = _a.ln, ln = _b === void 0 ? "en" : _b, onConfirm = _a.onConfirm, onClear = _a.onClear, _c = _a.clearBtnTitle, clearBtnTitle = _c === void 0 ? "Now" : _c, _d = _a.confirmBtnTitle, confirmBtnTitle = _d === void 0 ? "OK" : _d;
++    var _e = react_1.useState(moment_1.default()), selectedDate = _e[0], setSelectedDate = _e[1];
++    var _f = react_1.useState(null), firstDate = _f[0], setFirstDate = _f[1];
++    var _g = react_1.useState(null), secondDate = _g[0], setSecondDate = _g[1];
+     var lastMonth = selectedDate.clone().subtract(1, "months");
+     var lastYear = selectedDate.clone().subtract(1, "years");
+     var nextMonth = selectedDate.clone().add(1, "months");
+@@ -96,8 +94,8 @@ var DateRangePicker = function (_a) {
+         setFirstDate(null);
+         setSecondDate(null);
+         onSelectDateRange({
+-            firstDate: "",
+-            secondDate: "",
++            firstDate: moment().format('yyyy-MM-DD'),
++            secondDate: moment().format('yyyy-MM-DD'),
+         });
+         if (onClear) {
+             onClear();
+@@ -111,34 +109,36 @@ var DateRangePicker = function (_a) {
+     var isDateSelected = function () { return firstDate === null || secondDate === null; };
+     return (react_1.default.createElement(react_native_1.View, null,
+         react_1.default.createElement(react_native_1.View, { style: styles.titleRow },
+-            react_1.default.createElement(Button_1.default, { font: font, disabled: minDate ? lastYear.isBefore(minDate, "months") : false, label: "< ".concat(lastYear.format("YYYY")), onPress: function () { return setSelectedDate(lastYear); } }),
++            react_1.default.createElement(Button_1.default, { font: font, disabled: minDate ? lastYear.isBefore(minDate, "months") : false, label: "< " + lastYear.format("YYYY"), onPress: function () { return setSelectedDate(lastYear); } }),
+             react_1.default.createElement(react_native_1.Text, { style: __assign(__assign({}, styles.title), { fontFamily: font }) }, selectedDate.format("YYYY")),
+-            react_1.default.createElement(Button_1.default, { font: font, disabled: maxDate ? nextYear.isAfter(maxDate, "months") : false, label: "".concat(nextYear.format("YYYY"), " >"), onPress: function () { return setSelectedDate(nextYear); }, align: "right" })),
++            react_1.default.createElement(Button_1.default, { font: font, disabled: maxDate ? nextYear.isAfter(maxDate, "months") : false, label: nextYear.format("YYYY") + " >", onPress: function () { return setSelectedDate(nextYear); }, align: "right" })),
+         react_1.default.createElement(react_native_1.View, { style: styles.titleRow },
+-            react_1.default.createElement(Button_1.default, { font: font, disabled: minDate ? lastMonth.isBefore(minDate, "months") : false, label: "< ".concat(lastMonth.locale(ln).format("MMM")), onPress: function () { return setSelectedDate(lastMonth); } }),
++            react_1.default.createElement(Button_1.default, { font: font, disabled: minDate ? lastMonth.isBefore(minDate, "months") : false, label: "< " + lastMonth.locale(ln).format("MMM"), onPress: function () { return setSelectedDate(lastMonth); } }),
+             react_1.default.createElement(react_native_1.Text, { style: __assign(__assign({}, styles.title), { fontFamily: font }) }, selectedDate.locale(ln).format("MMMM")),
+-            react_1.default.createElement(Button_1.default, { font: font, disabled: maxDate ? nextMonth.isAfter(maxDate, "months") : false, label: "".concat(nextMonth.locale(ln).format("MMM"), " >"), onPress: function () { return setSelectedDate(nextMonth); }, align: "right" })),
++            react_1.default.createElement(Button_1.default, { font: font, disabled: maxDate ? nextMonth.isAfter(maxDate, "months") : false, label: nextMonth.locale(ln).format("MMM") + " >", onPress: function () { return setSelectedDate(nextMonth); }, align: "right" })),
+         react_1.default.createElement(Month_1.default, { font: font, selectedDate: selectedDate, onSelectDate: onSelectDate, firstDate: firstDate, secondDate: secondDate, maxDate: maxDate, minDate: minDate, selectedDateContainerStyle: selectedDateContainerStyle, selectedDateStyle: selectedDateStyle }),
+         react_1.default.createElement(react_native_1.View, { style: styles.actionButtonsContainer },
+             confirmBtnTitle ? react_1.default.createElement(react_native_1.View, null,
+                 react_1.default.createElement(react_native_1.Pressable, { onPress: onPressConfirm, style: [styles.actionBtn] },
+-                    react_1.default.createElement(react_native_1.Text, { style: { fontFamily: font } }, confirmBtnTitle))) : null,
++                    react_1.default.createElement(react_native_1.Text, { style: { fontFamily: font,color:'#000' } }, confirmBtnTitle))) : null,
+             clearBtnTitle ? react_1.default.createElement(react_native_1.View, null,
+-                react_1.default.createElement(react_native_1.Pressable, { disabled: isDateSelected(), onPress: onPressClear, style: [styles.actionBtn, { opacity: isDateSelected() ? 0.3 : 1 }] },
+-                    react_1.default.createElement(react_native_1.Text, { style: { fontFamily: font } }, clearBtnTitle))) : null)));
++                react_1.default.createElement(react_native_1.Pressable, {onPress: onPressClear, style: [styles.actionBtn, { opacity: 1 }] },
++                    react_1.default.createElement(react_native_1.Text, { style: { fontFamily: font,color:'#000' } }, clearBtnTitle))) : null)));
+ };
+ exports.default = DateRangePicker;
+ var styles = react_native_1.StyleSheet.create({
+     titleRow: {
++        
+         flexDirection: "row",
+         justifyContent: "space-between",
+         alignItems: "center",
+-        backgroundColor: "#EEE",
++        backgroundColor:'#2596be',
+         marginBottom: 5,
+         padding: 5,
+         borderRadius: 5,
+     },
+     title: {
++        color:'#fff',
+         fontSize: 20,
+         flex: 1,
+         textAlign: "center",
+@@ -148,6 +148,7 @@ var styles = react_native_1.StyleSheet.create({
+         paddingHorizontal: 10,
+     },
+     actionButtonsContainer: {
++        
+         flexDirection: "row",
+         justifyContent: "space-between",
+         paddingVertical: 5,
+diff --git a/node_modules/rn-select-date-range/lib/cjs/Month.d.ts b/node_modules/rn-select-date-range/lib/cjs/Month.d.ts
+index 4a2774f..e79b128 100644
+--- a/node_modules/rn-select-date-range/lib/cjs/Month.d.ts
++++ b/node_modules/rn-select-date-range/lib/cjs/Month.d.ts
+@@ -1,4 +1,3 @@
+-/// <reference types="react" />
+ import { ViewStyle, TextStyle } from "react-native";
+ import moment from "moment";
+ interface IProps {
+diff --git a/node_modules/rn-select-date-range/lib/cjs/Month.js b/node_modules/rn-select-date-range/lib/cjs/Month.js
+index 6aa0bf7..f08cd97 100644
+--- a/node_modules/rn-select-date-range/lib/cjs/Month.js
++++ b/node_modules/rn-select-date-range/lib/cjs/Month.js
+@@ -10,14 +10,10 @@ var __assign = (this && this.__assign) || function () {
+     };
+     return __assign.apply(this, arguments);
+ };
+-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+-        if (ar || !(i in from)) {
+-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+-            ar[i] = from[i];
+-        }
+-    }
+-    return to.concat(ar || Array.prototype.slice.call(from));
++var __spreadArray = (this && this.__spreadArray) || function (to, from) {
++    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
++        to[j] = from[i];
++    return to;
+ };
+ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+@@ -30,7 +26,7 @@ exports.default = (function (_a) {
+     var selectedDate = _a.selectedDate, onSelectDate = _a.onSelectDate, firstDate = _a.firstDate, secondDate = _a.secondDate, maxDate = _a.maxDate, minDate = _a.minDate, selectedDateContainerStyle = _a.selectedDateContainerStyle, font = _a.font, selectedDateStyle = _a.selectedDateStyle;
+     var weekDayShort = moment_1.default.weekdaysShort();
+     var weekDayShortName = weekDayShort.map(function (day) {
+-        return (react_1.default.createElement(react_native_1.View, { key: "".concat(day, "_week_days"), style: styles.dayNameContainer },
++        return (react_1.default.createElement(react_native_1.View, { key: day + "_week_days", style: styles.dayNameContainer },
+             react_1.default.createElement(react_native_1.Text, { style: __assign(__assign({}, styles.dayNameStyle), { fontFamily: font }) }, day)));
+     });
+     var firstDayOfMonth = function () {
+@@ -41,21 +37,21 @@ exports.default = (function (_a) {
+     var getRows = function () {
+         var blanks = [];
+         for (var index = 0; index < firstDayOfMonth(); index++) {
+-            blanks.push(react_1.default.createElement(react_native_1.View, { key: "".concat(index, "_days_blanks"), style: styles.emptyDayNameContainer }));
++            blanks.push(react_1.default.createElement(react_native_1.View, { key: index + "_days_blanks", style: styles.emptyDayNameContainer }));
+         }
+         var daysInMonth = [];
+         var _loop_1 = function (d) {
+-            var date = (0, moment_1.default)(selectedDate).date(d);
++            var date = moment_1.default(selectedDate).date(d);
+             var isDisabledMAXD = maxDate ? date.isAfter(maxDate, "days") : false;
+             var isDisabledMIND = minDate ? date.isBefore(minDate, "days") : false;
+-            var isToday = date.isSame((0, moment_1.default)(), "day");
++            var isToday = date.isSame(moment_1.default(), "day");
+             var iddd = secondDate === null || secondDate === void 0 ? void 0 : secondDate.isBefore(firstDate);
+             var isSelected = (iddd
+                 ? date.isBetween(secondDate, firstDate)
+                 : date.isBetween(firstDate, secondDate)) ||
+                 date.isSame(firstDate, "day") ||
+                 date.isSame(secondDate, "day");
+-            daysInMonth.push(react_1.default.createElement(react_native_1.TouchableOpacity, { key: "".concat(d, "_date_month"), disabled: isDisabledMAXD || isDisabledMIND, onPress: function () { return onSelectDate(date); }, style: styles.dayNameContainer },
++            daysInMonth.push(react_1.default.createElement(react_native_1.TouchableOpacity, { key: d + "_date_month", disabled: isDisabledMAXD || isDisabledMIND, onPress: function () { return onSelectDate(date); }, style: styles.dayNameContainer },
+                 react_1.default.createElement(react_native_1.View, { style: isSelected
+                         ? selectedDateContainerStyle
+                             ? selectedDateContainerStyle
+@@ -76,7 +72,7 @@ exports.default = (function (_a) {
+         for (var d = 1; d <= selectedDate.daysInMonth(); d++) {
+             _loop_1(d);
+         }
+-        var totalSlots = __spreadArray(__spreadArray([], blanks, true), daysInMonth, true);
++        var totalSlots = __spreadArray(__spreadArray([], blanks), daysInMonth);
+         var rows = [];
+         var cells = [];
+         totalSlots.forEach(function (row, index) {
+@@ -84,16 +80,16 @@ exports.default = (function (_a) {
+                 cells.push(row);
+             }
+             else {
+-                rows.push(react_1.default.createElement(react_native_1.View, { key: "".concat(index, "_week"), style: styles.weekRow }, cells));
++                rows.push(react_1.default.createElement(react_native_1.View, { key: index + "_week", style: styles.weekRow }, cells));
+                 cells = [];
+                 cells.push(row);
+             }
+             if (index === totalSlots.length - 1) {
+                 var remain = 7 - cells.length;
+                 for (var indexRemain = 0; indexRemain < remain; indexRemain++) {
+-                    cells.push(react_1.default.createElement(react_native_1.View, { key: "".concat(indexRemain, "_remain_dates"), style: styles.emptyDayNameContainer }));
++                    cells.push(react_1.default.createElement(react_native_1.View, { key: indexRemain + "_remain_dates", style: styles.emptyDayNameContainer }));
+                 }
+-                rows.push(react_1.default.createElement(react_native_1.View, { key: "".concat(index, "_week_").concat(selectedDate.format("MMMM")), style: styles.weekRow }, cells));
++                rows.push(react_1.default.createElement(react_native_1.View, { key: index + "_week_" + selectedDate.format("MMMM"), style: styles.weekRow }, cells));
+             }
+         });
+         return rows;
+@@ -104,6 +100,7 @@ exports.default = (function (_a) {
+ });
+ var styles = react_native_1.StyleSheet.create({
+     weekRow: {
++        
+         flexDirection: "row",
+         justifyContent: "space-between",
+     },
+diff --git a/node_modules/rn-select-date-range/lib/esm/Button.d.ts b/node_modules/rn-select-date-range/lib/esm/Button.d.ts
+index c759373..cc017f5 100644
+--- a/node_modules/rn-select-date-range/lib/esm/Button.d.ts
++++ b/node_modules/rn-select-date-range/lib/esm/Button.d.ts
+@@ -1,4 +1,3 @@
+-/// <reference types="react" />
+ interface IProps {
+     label: string;
+     onPress: () => void;
+diff --git a/node_modules/rn-select-date-range/lib/esm/DateRangePicker.d.ts b/node_modules/rn-select-date-range/lib/esm/DateRangePicker.d.ts
+index 0437c0a..7d02f47 100644
+--- a/node_modules/rn-select-date-range/lib/esm/DateRangePicker.d.ts
++++ b/node_modules/rn-select-date-range/lib/esm/DateRangePicker.d.ts
+@@ -1,4 +1,3 @@
+-/// <reference types="react" />
+ import { ViewStyle, TextStyle } from "react-native";
+ import moment from "moment";
+ interface IResponse {
+diff --git a/node_modules/rn-select-date-range/lib/esm/DateRangePicker.js b/node_modules/rn-select-date-range/lib/esm/DateRangePicker.js
+index 4961605..d6947e8 100644
+--- a/node_modules/rn-select-date-range/lib/esm/DateRangePicker.js
++++ b/node_modules/rn-select-date-range/lib/esm/DateRangePicker.js
+@@ -83,13 +83,13 @@ var DateRangePicker = function (_a) {
+     var isDateSelected = function () { return firstDate === null || secondDate === null; };
+     return (React.createElement(View, null,
+         React.createElement(View, { style: styles.titleRow },
+-            React.createElement(Button, { font: font, disabled: minDate ? lastYear.isBefore(minDate, "months") : false, label: "< ".concat(lastYear.format("YYYY")), onPress: function () { return setSelectedDate(lastYear); } }),
++            React.createElement(Button, { font: font, disabled: minDate ? lastYear.isBefore(minDate, "months") : false, label: "< " + lastYear.format("YYYY"), onPress: function () { return setSelectedDate(lastYear); } }),
+             React.createElement(Text, { style: __assign(__assign({}, styles.title), { fontFamily: font }) }, selectedDate.format("YYYY")),
+-            React.createElement(Button, { font: font, disabled: maxDate ? nextYear.isAfter(maxDate, "months") : false, label: "".concat(nextYear.format("YYYY"), " >"), onPress: function () { return setSelectedDate(nextYear); }, align: "right" })),
++            React.createElement(Button, { font: font, disabled: maxDate ? nextYear.isAfter(maxDate, "months") : false, label: nextYear.format("YYYY") + " >", onPress: function () { return setSelectedDate(nextYear); }, align: "right" })),
+         React.createElement(View, { style: styles.titleRow },
+-            React.createElement(Button, { font: font, disabled: minDate ? lastMonth.isBefore(minDate, "months") : false, label: "< ".concat(lastMonth.locale(ln).format("MMM")), onPress: function () { return setSelectedDate(lastMonth); } }),
++            React.createElement(Button, { font: font, disabled: minDate ? lastMonth.isBefore(minDate, "months") : false, label: "< " + lastMonth.locale(ln).format("MMM"), onPress: function () { return setSelectedDate(lastMonth); } }),
+             React.createElement(Text, { style: __assign(__assign({}, styles.title), { fontFamily: font }) }, selectedDate.locale(ln).format("MMMM")),
+-            React.createElement(Button, { font: font, disabled: maxDate ? nextMonth.isAfter(maxDate, "months") : false, label: "".concat(nextMonth.locale(ln).format("MMM"), " >"), onPress: function () { return setSelectedDate(nextMonth); }, align: "right" })),
++            React.createElement(Button, { font: font, disabled: maxDate ? nextMonth.isAfter(maxDate, "months") : false, label: nextMonth.locale(ln).format("MMM") + " >", onPress: function () { return setSelectedDate(nextMonth); }, align: "right" })),
+         React.createElement(Month, { font: font, selectedDate: selectedDate, onSelectDate: onSelectDate, firstDate: firstDate, secondDate: secondDate, maxDate: maxDate, minDate: minDate, selectedDateContainerStyle: selectedDateContainerStyle, selectedDateStyle: selectedDateStyle }),
+         React.createElement(View, { style: styles.actionButtonsContainer },
+             confirmBtnTitle ? React.createElement(View, null,
+diff --git a/node_modules/rn-select-date-range/lib/esm/Month.d.ts b/node_modules/rn-select-date-range/lib/esm/Month.d.ts
+index 4a2774f..e79b128 100644
+--- a/node_modules/rn-select-date-range/lib/esm/Month.d.ts
++++ b/node_modules/rn-select-date-range/lib/esm/Month.d.ts
+@@ -1,4 +1,3 @@
+-/// <reference types="react" />
+ import { ViewStyle, TextStyle } from "react-native";
+ import moment from "moment";
+ interface IProps {
+diff --git a/node_modules/rn-select-date-range/lib/esm/Month.js b/node_modules/rn-select-date-range/lib/esm/Month.js
+index ea893d0..0609f7c 100644
+--- a/node_modules/rn-select-date-range/lib/esm/Month.js
++++ b/node_modules/rn-select-date-range/lib/esm/Month.js
+@@ -9,14 +9,10 @@ var __assign = (this && this.__assign) || function () {
+     };
+     return __assign.apply(this, arguments);
+ };
+-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+-        if (ar || !(i in from)) {
+-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+-            ar[i] = from[i];
+-        }
+-    }
+-    return to.concat(ar || Array.prototype.slice.call(from));
++var __spreadArray = (this && this.__spreadArray) || function (to, from) {
++    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
++        to[j] = from[i];
++    return to;
+ };
+ import React from "react";
+ import { View, Text, StyleSheet, TouchableOpacity, } from "react-native";
+@@ -25,7 +21,7 @@ export default (function (_a) {
+     var selectedDate = _a.selectedDate, onSelectDate = _a.onSelectDate, firstDate = _a.firstDate, secondDate = _a.secondDate, maxDate = _a.maxDate, minDate = _a.minDate, selectedDateContainerStyle = _a.selectedDateContainerStyle, font = _a.font, selectedDateStyle = _a.selectedDateStyle;
+     var weekDayShort = moment.weekdaysShort();
+     var weekDayShortName = weekDayShort.map(function (day) {
+-        return (React.createElement(View, { key: "".concat(day, "_week_days"), style: styles.dayNameContainer },
++        return (React.createElement(View, { key: day + "_week_days", style: styles.dayNameContainer },
+             React.createElement(Text, { style: __assign(__assign({}, styles.dayNameStyle), { fontFamily: font }) }, day)));
+     });
+     var firstDayOfMonth = function () {
+@@ -36,7 +32,7 @@ export default (function (_a) {
+     var getRows = function () {
+         var blanks = [];
+         for (var index = 0; index < firstDayOfMonth(); index++) {
+-            blanks.push(React.createElement(View, { key: "".concat(index, "_days_blanks"), style: styles.emptyDayNameContainer }));
++            blanks.push(React.createElement(View, { key: index + "_days_blanks", style: styles.emptyDayNameContainer }));
+         }
+         var daysInMonth = [];
+         var _loop_1 = function (d) {
+@@ -50,7 +46,7 @@ export default (function (_a) {
+                 : date.isBetween(firstDate, secondDate)) ||
+                 date.isSame(firstDate, "day") ||
+                 date.isSame(secondDate, "day");
+-            daysInMonth.push(React.createElement(TouchableOpacity, { key: "".concat(d, "_date_month"), disabled: isDisabledMAXD || isDisabledMIND, onPress: function () { return onSelectDate(date); }, style: styles.dayNameContainer },
++            daysInMonth.push(React.createElement(TouchableOpacity, { key: d + "_date_month", disabled: isDisabledMAXD || isDisabledMIND, onPress: function () { return onSelectDate(date); }, style: styles.dayNameContainer },
+                 React.createElement(View, { style: isSelected
+                         ? selectedDateContainerStyle
+                             ? selectedDateContainerStyle
+@@ -71,7 +67,7 @@ export default (function (_a) {
+         for (var d = 1; d <= selectedDate.daysInMonth(); d++) {
+             _loop_1(d);
+         }
+-        var totalSlots = __spreadArray(__spreadArray([], blanks, true), daysInMonth, true);
++        var totalSlots = __spreadArray(__spreadArray([], blanks), daysInMonth);
+         var rows = [];
+         var cells = [];
+         totalSlots.forEach(function (row, index) {
+@@ -79,16 +75,16 @@ export default (function (_a) {
+                 cells.push(row);
+             }
+             else {
+-                rows.push(React.createElement(View, { key: "".concat(index, "_week"), style: styles.weekRow }, cells));
++                rows.push(React.createElement(View, { key: index + "_week", style: styles.weekRow }, cells));
+                 cells = [];
+                 cells.push(row);
+             }
+             if (index === totalSlots.length - 1) {
+                 var remain = 7 - cells.length;
+                 for (var indexRemain = 0; indexRemain < remain; indexRemain++) {
+-                    cells.push(React.createElement(View, { key: "".concat(indexRemain, "_remain_dates"), style: styles.emptyDayNameContainer }));
++                    cells.push(React.createElement(View, { key: indexRemain + "_remain_dates", style: styles.emptyDayNameContainer }));
+                 }
+-                rows.push(React.createElement(View, { key: "".concat(index, "_week_").concat(selectedDate.format("MMMM")), style: styles.weekRow }, cells));
++                rows.push(React.createElement(View, { key: index + "_week_" + selectedDate.format("MMMM"), style: styles.weekRow }, cells));
+             }
+         });
+         return rows;

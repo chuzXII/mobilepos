@@ -19,10 +19,14 @@ import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import { MasonryFlashList } from '@shopify/flash-list';
 import { Ifilter } from '../../assets/icon';
+import BASE_URL from '../../../config';
 
-const Dashboard = () => {
+const Dashboard = ({route}) => {
+  const params =route.params
   const [refreshing, setRefreshing] = useState(false);
   const [item, setItems] = useState([]);
+  const [Datakateogri, setDatakateogri] = useState([]);
+
   const [DumyData, setDumyData] = useState([]);
 
   const [LengthData, setLengthData] = useState(100);
@@ -33,15 +37,7 @@ const Dashboard = () => {
   const currency = new Intl.NumberFormat('id-ID');
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
-  const datacategory = [
-    { id: 1, category: 'All' },
-    { id: 2, category: 'Mod' },
-    { id: 3, category: 'Pod' },
-    { id: 4, category: 'Accecories' },
-    { id: 5, category: 'Authomizer' },
-    { id: 6, category: 'Freebase' },
-    { id: 7, category: 'Saltnic' },
-  ];
+
   const isPortrait = () => {
     const dim = Dimensions.get('screen');
     return dim.height >= dim.width;
@@ -56,64 +52,41 @@ const Dashboard = () => {
 
   const get = async () => {
 
-    setModalVisibleLoading(true);
-    const sheetid = await AsyncStorage.getItem('TokenSheet');
-    const token = await AsyncStorage.getItem('tokenAccess');
-    await axios
-      .get(
-        'https://sheets.googleapis.com/v4/spreadsheets/' +
-        sheetid +
-        '/values/Produk',
-        {
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        },
-      )
-      .then(res => {
-
-
-        // const a = res.data.values.filter(item=>item[0]==3)
-        // console.log(a[0][1].length)
-        if (res.data.values == undefined) {
-          setItems([]);
-          setRefreshing(false);
-
-          setModalVisibleLoading(false);
-        } else {
-          setItems(res.data.values);
-          setLengthData(res.data.values.length)
-          setRefreshing(false);
-          setDumyData(res.data.values);
-          setModalVisibleLoading(false);
-        }
-      }).catch(error => {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-          alert(error.message);
-          setRefreshing(false);
-
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-          alert(error.message);
-          setRefreshing(false);
-
-        } else {
-          console.log('Error', error.message);
-          alert(error.message);
-          setRefreshing(false);
-        }
-      });
-
+    try {
+      setModalVisibleLoading(true);
+      const token = await AsyncStorage.getItem('tokenAccess');
+      const [res1, res2] = await Promise.all([
+        axios.get(`${BASE_URL}/produk/${params.data.data.id_toko}/false`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+        axios.get(`${BASE_URL}/kategori`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }),
+      ]);
+      setItems(res1.data.data);
+      setDatakateogri(res2.data.data)
+      setDumyData(res1.data.data)
+      setLengthData(res1.data.data.length)
+      setRefreshing(false);
+      setModalVisibleLoading(false);
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+        alert(error.message);
+        setRefreshing(false);
+      } else if (error.request) {
+        console.log(error.request);
+        alert(error.message);
+        setRefreshing(false);
+      } else {
+        console.log('Error', error.message);
+        alert(error.message);
+        setRefreshing(false);
+      }
+    };
   };
-  // navigation.addListener('focus', get)
 
   const onlongpress = () => {
     dispatch({ type: 'REMOVEALL' });
@@ -125,7 +98,7 @@ const Dashboard = () => {
         setModalVisibleCategory(!modalVisibleCategory)
       }
       else {
-        const a = DumyData.filter(fill => fill[3] != null ? fill[3].toLowerCase() == category.toLowerCase() : null)
+        const a = DumyData.filter(fill => fill.kategori.nama_kategori != null ? fill.kategori.nama_kategori.toLowerCase() == category.toLowerCase() : null)
         setItems(a)
         setModalVisibleCategory(!modalVisibleCategory)
       }
@@ -137,16 +110,12 @@ const Dashboard = () => {
       }
       else {
         const results = DumyData.filter(product => {
-          const productName = product[1].toLowerCase();
+          const productName = product.nama_produk.toLowerCase();
           return productName.includes(textinput.toLowerCase());
         });
-
         setItems(results)
-
       }
     }
-
-
   };
 
   const renderitem = (item) => {
@@ -160,10 +129,9 @@ const Dashboard = () => {
     setRefreshing(true);
     get();
   };
-
   useEffect(() => {
     get();
-    
+
   }, [isFocused]);
 
   return (
@@ -210,7 +178,6 @@ const Dashboard = () => {
           onPress={() => navigation.navigate('cartpage')}>
           <View style={styles.wrapChart}>
             <View style={styles.row}>
-              {/* <Icart /> */}
               <Text style={styles.textButtonChart}>
                 {currency.format(
                   CartReducer.cartitem.reduce(
@@ -273,17 +240,24 @@ const Dashboard = () => {
                   textAlign: 'center',
                   marginVertical: 12,
                 }}>
-                Category
+                Kategori
               </Text>
               <ScrollView style={{ flex: 1, marginBottom: 42 }}>
-                {datacategory.map((item, i) => {
+                <TouchableOpacity
+                  style={styles.btnitemcategory}
+                  onPress={() => Filter(null, "all")}>
+                  <Text style={{ color: '#000', textAlign: 'center' }}>
+                    all
+                  </Text>
+                </TouchableOpacity>
+                {Datakateogri.map((item, i) => {
                   return (
                     <TouchableOpacity
                       key={i}
                       style={styles.btnitemcategory}
-                      onPress={() => Filter(null, item.category)}>
+                      onPress={() => Filter(null, item.nama_kategori)}>
                       <Text style={{ color: '#000', textAlign: 'center' }}>
-                        {item.category}
+                        {item.nama_kategori}
                       </Text>
                     </TouchableOpacity>
                   );
