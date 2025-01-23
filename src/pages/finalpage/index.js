@@ -17,7 +17,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { chillLogo } from '../../assets/image/logo';
 
 
-const FinalPage = ({navigation}) => {
+const FinalPage = ({route,navigation}) => {
+  const params = route.params
+  // console.log(params.data.items)
   const currency = new Intl.NumberFormat('id-ID');
   const CartReducer = useSelector(state => state.CartReducer);
   const TRXReducer = useSelector(state => state.TRXReducer);
@@ -197,14 +199,14 @@ const FinalPage = ({navigation}) => {
     return (
       <View style={{flexDirection: 'row',alignItems:'center'}}>
         <View style={{flex: 4}}>
-          <Text style={{color: '#000'}}>{items.item[1]}</Text>
+          <Text style={{color: '#000'}}>{items.nama_produk}</Text>
             <View style={{flexDirection: 'row'}}>
-              <Text style={{color: '#000'}}>{items.count}x </Text>
-              <Text style={{color: '#000'}}>Rp.{currency.format(items.subTotal)}</Text>
+              <Text style={{color: '#000'}}>{items.qty}x </Text>
+              <Text style={{color: '#000'}}>Rp.{currency.format(items.harga)}</Text>
             </View>
         </View>
         <View style={{flex: 2}}>
-          <Text style={{color: '#000'}}>Rp.{currency.format(items.subTotal*items.count)}</Text>
+          <Text style={{color: '#000'}}>Rp.{currency.format(items.subtotal)}</Text>
         </View>
         
       </View>
@@ -263,20 +265,20 @@ const FinalPage = ({navigation}) => {
              
               <Text style={{color: '#000', flex: 2,fontFamily:'TitilliumWeb-Bold'}}>Harga</Text>
             </View>
-            {CartReducer.cartitem.map((items, index) => {
+            {params.data.items.map((items, index) => {
               return <View style={{paddingVertical:12}}  key={index}>
                 {renderitem(items)}
                 <View style={{ borderBottomWidth: StyleSheet.hairlineWidth,marginTop:6}}></View>
               </View>;
             })}
 
-            <View
+            {/* <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={{color: '#000', flex: 4,fontFamily:'TitilliumWeb-Regular'}}>SubTotal</Text>
 
               <Text style={{color: '#000', flex: 2,fontFamily:'TitilliumWeb-Regular'}}>
                 Rp.
-                {currency.format(currencystate.subtotal)}
+                {currency.format(params.data.totalharga)}
               </Text>
             </View>
             <View
@@ -293,23 +295,23 @@ const FinalPage = ({navigation}) => {
               </Text>
               }
              
-            </View>
-            <View style={{ borderBottomWidth: StyleSheet.hairlineWidth,marginVertical:6}}></View>
+            </View> */}
+            {/* <View style={{ borderBottomWidth: StyleSheet.hairlineWidth,marginVertical:6}}></View> */}
 
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={{color: '#000', flex: 4,fontFamily:'TitilliumWeb-Bold'}}>Total</Text>
 
               <Text style={{color: '#000', flex: 2,fontFamily:'TitilliumWeb-Bold'}}>
-                Rp.{currency.format(currencystate.total)}
+                Rp.{currency.format(params.data.totalharga)}
               </Text>
             </View>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={{color: '#000', flex: 4,fontFamily:'TitilliumWeb-Bold'}}>Tunai</Text>
+              <Text style={{color: '#000', flex: 4,fontFamily:'TitilliumWeb-Bold'}}>Bayar</Text>
 
               <Text style={{color: '#000', flex: 2,fontFamily:'TitilliumWeb-Bold'}}>
-                Rp.{currency.format(currencystate.tunai)}
+                Rp.{currency.format(params.data.pembayaran)}
               </Text>
             </View>
             <View
@@ -318,7 +320,7 @@ const FinalPage = ({navigation}) => {
 
               <Text style={{color: '#000', flex: 2,fontFamily:'TitilliumWeb-Bold'}}>
                 Rp.
-                {currency.format(currencystate.kembalian)}
+                {currency.format(params.data.kembalian)}
               </Text>
             </View>
           </View>

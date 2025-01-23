@@ -22,18 +22,20 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { emptycart, emptyproduct } from '../../assets/image';
 import moment from 'moment';
+import BASE_URL from '../../../config';
 
 
-const Cartpage = () => {
+const Cartpage = ({ route }) => {
+  const params = route.params
   const currency = new Intl.NumberFormat('id-ID');
   const navigation = useNavigation();
   const CartReducer = useSelector(state => state.CartReducer);
-  const TRXReducer = useSelector(state => state.TRXReducer);
+  // const TRXReducer = useSelector(state => state.TRXReducer);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalDiskonVisible, setModalDiskonVisible] = useState(false);
   const [modalVisibleLoading, setModalVisibleLoading] = useState(false);
   const [modalVisibleNote, setModalVisibleNote] = useState(false);
-  const [nominal, setNominal] = useState();
+  const [nominal, setNominal] = useState("");
   const [DataDiskon, setDataDiskon] = useState([]);
   const [Diskon, setDiskon] = useState(0);
   const [NamaDiskon, setNamaDiskon] = useState(' ');
@@ -45,158 +47,100 @@ const Cartpage = () => {
     return <CardItem item={item} />;
   };
 
-  const input = ({sheetid, token, data, indexs, listcount, stoksisa}) => {
-    axios
-      .post(
-        'https://sheets.googleapis.com/v4/spreadsheets/' +
-        sheetid +
-        '/values/Transaksi!A1:append?valueInputOption=USER_ENTERED',
-        JSON.stringify({
-          values: data,
-        }),
-        {
-          headers: {
-            'Content-type': 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
-        },
-      )
-      .then((res) => {
-        setModalVisibleLoading(false);
-        setModalVisible(!modalVisible);
-        navigation.replace('finalpage');
-      })
-      .catch(e => {
-        console.log(e);
-      });
+  const input = ({ sheetid, token, data, indexs, listcount, stoksisa }) => {
+
   };
   const checkout = async Total => {
-    const sheetid = await AsyncStorage.getItem('TokenSheet');
-    const user = JSON.parse(await AsyncStorage.getItem('usergooglesignin'));
     const token = await AsyncStorage.getItem('tokenAccess');
+    const user = JSON.parse(await AsyncStorage.getItem('datasession'));
+    const id_toko = params.data.id_toko;
+    let id_user = user.user.id_user
     const data = [];
+    const items = [];
     let indexs = [];
-    let checkstok;
-    const rawdate = new Date();
-    // await axios
-    //   .get(
-    //     'https://sheets.googleapis.com/v4/spreadsheets/' +
-    //       sheetid +
-    //       '/values/Produk',
-    //     {
-    //       headers: {
-    //         Authorization: 'Bearer ' + token,
-    //       },
-    //     },
-    //   )
-    //   .then(res => {
-    //     var value = CartReducer.cartitem.sort((a, b) => (a.id > b.id ? 1 : -1));
-    //     var b = [];
-    //     for (let i = 0; i < CartReducer.cartitem.length; i++) {
-    //       const a = res.data.values.filter(
-    //         element => element[0] == CartReducer.cartitem[i].item[0],
-    //       );
-    //       b.push(a);
-    //     }
-    //     const f = b.sort((a, b) => (a[4] > b[4] ? 1 : -1));
-    //       if (f[0][0][4] == 0) {
-    //         checkstok = true;
-    //       } else {
-    //         for (let i = 0; i < CartReducer.cartitem.length; i++) {
-    //         indexs.push(
-    //           res.data.values.findIndex(e => e[0] == value[i].item[0]) + 1,
-    //         );
-    //         listcount.push(parseInt(value[i].item[3]) + value[i].count);
-    //         stoksisa.push(value[i].item[4] - value[i].count);
-    //       }
-    //     }
-    // console.log(checkstok)
 
-    if (!checkstok) {
-      dispatch({ type: 'NOMINAL', value: Total });
+    let numericValue;
 
-      for (let i = 0; i < CartReducer.cartitem.length; i++) {
-        const namaproduk = CartReducer.cartitem[i].item[1];
-        const hargaproduk = CartReducer.cartitem[i].item[2];
-        const count = CartReducer.cartitem[i].count;
-        const tglorder = moment(rawdate).format('DD-MM-yyyy HH:mm:ss');
-        const timestamp = Date.parse(moment().format('yyyy-MM-DD'));
-        data.push([
-          TRXReducer.id_produk,
-          namaproduk,
-          count,
-          hargaproduk,
-          Total.toString(),
-          tglorder,
-          timestamp,
-          NamaDiskon.concat(' ' + Diskon),
-          Note,
-          user.name,
-          'Lunas',
-        ]);
-      }
-      input({ sheetid, token, data, indexs, });
-
+    if (isNaN(Total)) {
+      // If Total is not a number, replace non-numeric characters
+      numericValue = Total.replace(/[^0-9]/g, '');
+      bayar = parseInt(numericValue, 10);
     } else {
-      Alert.alert(
-        'STOK HABIS',
-        'Ada Stok Yang Lagi Kosong, Silahkan Tambah Terlebih Dahulu LaLu Lanjutkan Transaksi',
-        [{ text: 'OK', onPress: () => navigation.replace('listkatalog') }],
-        { cancelable: false },
-      );
+      // If Total is already a number, just assign it directly
+      bayar = parseInt(Total, 10);
     }
+    // dispatch({ type: 'NOMINAL', value: Total });
 
-    // for (let i = 0; i < CartReducer.cartitem.length; i++) {
-    //   res.data.values.filter((element, index, array) => {
-    //     if (element[0] == CartReducer.cartitem[i].item[0]) {
-    //       indexs.push(index + 1);
-    //       var value = CartReducer.cartitem.sort((a, b) =>
-    //         a.id > b.id ? 1 : -1,
-    //       );
-    //       listcount.push(parseInt(value[i].item[3]) + value[i].count);
-    //       stoksisa.push(value[i].item[4] - value[i].count);
-    //     }
-    //   });
-    // }
-    // })
-    // .catch(e => {
-    //   console.log(e);
-    // });
+    for (let i = 0; i < CartReducer.cartitem.length; i++) {
+      const qty = CartReducer.cartitem[i].count;
+      const kode_produk = CartReducer.cartitem[i].item.kode_produk;
+
+      items.push({ kode_produk, qty });
+    }
+    data.push({ id_user, id_toko, items, bayar })
+
+    try {
+      const response = await axios.post(`${BASE_URL}/transaksi`, data[0], {
+        headers: {
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      console.log('Transaksi berhasil:', response.data);
+      navigation.replace('finalpage',{data:response.data})
+    } catch (error) {
+      console.error('Terjadi kesalahan saat mengirim transaksi:', error.response || error.message);
+    }
+    // input({ sheetid, token, data, indexs, });
+
+
+    // Alert.alert(
+    //   'STOK HABIS',
+    //   'Ada Stok Yang Lagi Kosong, Silahkan Tambah Terlebih Dahulu LaLu Lanjutkan Transaksi',
+    //   [{ text: 'OK', onPress: () => navigation.replace('listkatalog') }],
+    //   { cancelable: false },
+    // );
+
   };
   const onPressTunai = type => {
-    setModalVisibleLoading(true);
+    // setModalVisibleLoading(true);
     if (type === 'PAS') {
       let total;
-      if (Diskon == 0) {
-        total =
-          CartReducer.cartitem.reduce(
-            (result, item) => item.count * item.subTotal + result,
-            0,
-          ) - Diskon;
-      } else {
-        if (Diskon.split('-').length <= 1) {
-          total =
-            CartReducer.cartitem.reduce(
-              (result, item) => item.count * item.subTotal + result,
-              0,
-            ) - Diskon.split('-')[0];
-        } else {
-          total =
-            CartReducer.cartitem.reduce(
-              (result, item) => item.count * item.subTotal + result,
-              0,
-            ) -
-            (CartReducer.cartitem.reduce(
-              (result, item) => item.count * item.subTotal + result,
-              0,
-            ) *
-              Diskon.split('-')[0]) /
-            100;
-        }
-      }
-
+      // if (Diskon == 0) {
+      //   total =
+      //     CartReducer.cartitem.reduce(
+      //       (result, item) => item.count * item.subTotal + result,
+      //       0,
+      //     ) - Diskon;
+      // } else {
+      //   if (Diskon.split('-').length <= 1) {
+      //     total =
+      //       CartReducer.cartitem.reduce(
+      //         (result, item) => item.count * item.subTotal + result,
+      //         0,
+      //       ) - Diskon.split('-')[0];
+      //   } else {
+      //     total =
+      //       CartReducer.cartitem.reduce(
+      //         (result, item) => item.count * item.subTotal + result,
+      //         0,
+      //       ) -
+      //       (CartReducer.cartitem.reduce(
+      //         (result, item) => item.count * item.subTotal + result,
+      //         0,
+      //       ) *
+      //         Diskon.split('-')[0]) /
+      //       100;
+      //   }
+      // }
+      total =
+        CartReducer.cartitem.reduce(
+          (result, item) => item.count * item.subTotal + result,
+          0,
+        )
       checkout(total);
     } else {
+      console.log(nominal)
       if (
         nominal == null ||
         nominal == '' ||
@@ -264,6 +208,16 @@ const Cartpage = () => {
   const onLongPressDiskon = () => {
     setDiskon(0);
   };
+  const formatCurrency = (value) => {
+    const numericValue = value.replace(/[^0-9]/g, '');
+    if (numericValue === '') return '';
+    const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return `Rp ${formattedValue}`;
+  };
+  const handleTextChange = (value) => {
+    const formattedValue = formatCurrency(value);
+    setNominal(formattedValue);
+  };
 
   return (
     <View style={styles.container}>
@@ -303,17 +257,17 @@ const Cartpage = () => {
             <Text
               style={{
                 color: '#000',
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: '500',
                 fontFamily: 'TitilliumWeb-Bold',
                 paddingVertical: 8,
               }}>
-              SUBTOTAL
+              Total
             </Text>
             <Text
               style={{
                 color: '#000',
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: '500',
                 fontFamily: 'TitilliumWeb-Bold',
                 paddingVertical: 8,
@@ -326,6 +280,7 @@ const Cartpage = () => {
                 ),
               )}
             </Text>
+
             {/* <FlatList
               key={'flatlist'}
               data={CartReducer.cartitem}
@@ -334,7 +289,8 @@ const Cartpage = () => {
               contentInset={{bottom: 150}}
             /> */}
           </View>
-          <View style={{ backgroundColor: '#fff' }}>
+
+          {/* <View style={{ backgroundColor: '#fff' }}>
             <TouchableOpacity
               style={{
                 textAlign: 'center',
@@ -412,8 +368,8 @@ const Cartpage = () => {
                 </View>
               </View>
             </TouchableOpacity>
-          </View>
-          <View style={{ backgroundColor: '#fff' }}>
+          </View> */}
+          {/* <View style={{ backgroundColor: '#fff' }}>
             <TouchableOpacity
               style={{
                 textAlign: 'center',
@@ -466,9 +422,9 @@ const Cartpage = () => {
                 </View>
               </View>
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={styles.box2}>
-            <View style={{ width: '50%' }}>
+            {/* <View style={{ width: '50%' }}>
               <Text style={styles.total_price}>
                 Total: Rp.
                 {currency.format(
@@ -494,11 +450,14 @@ const Cartpage = () => {
                       100,
                 )}
               </Text>
-            </View>
-            <View style={{ width: '50%' }}>
+            </View> */}
+            <View style={{ width: '100%' }}>
               <TouchableOpacity
                 style={styles.checkout_container}
-                onPress={() => setModalVisible(true)}>
+                onPress={() => {
+                  setNominal("")
+                  setModalVisible(true)
+                }}>
                 <Text style={styles.checkout}>Checkout</Text>
               </TouchableOpacity>
             </View>
@@ -743,7 +702,7 @@ const Cartpage = () => {
                   borderRadius: 12,
                   fontFamily: 'TitilliumWeb-Regular',
                 }}
-                onChangeText={value => setNominal(value)}
+                onChangeText={value => handleTextChange(value)}
                 value={nominal}
                 keyboardType={'number-pad'}
               />

@@ -20,7 +20,7 @@ import BASE_URL from '../../../config';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 
 const ListKatalog = ({ route,navigation }) => {
-  const params = route.params.data
+  const params = route.params
   const [Data, setData] = useState([]);
   const [DumyData, setDumyData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);

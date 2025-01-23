@@ -90,7 +90,7 @@ const Formkasir = ({ route }) => {
         console.error('Error:', error.message);
       } else {
         alert('An unexpected error occurred. Please try again.');
-        console.error('Error:', error.message);
+        console.error('Error:', JSON.stringify(error.response));
       }
     } finally {
       // setLoading(false);

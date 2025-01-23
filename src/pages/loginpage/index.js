@@ -67,6 +67,7 @@ const Loginpage = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={'#000'}
         value={email}
         onChangeText={(text) => {
           setEmail(text);
@@ -80,6 +81,7 @@ const Loginpage = () => {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor={'#000'}
         value={password}
         onChangeText={(text) => {
           setPassword(text);
@@ -91,6 +93,12 @@ const Loginpage = () => {
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.registerButton}
+        onPress={() => navigation.navigate('regis')}
+      >
+        <Text style={styles.registerText}>Belum punya akun? Register</Text>
       </TouchableOpacity>
     </View>
   );
@@ -139,6 +147,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignSelf: 'flex-start',
   },
+  registerButton: {
+    marginTop: 16,
+  },
+  registerText: {
+    color: '#4CAF50',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  
 });
 
 

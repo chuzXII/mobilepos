@@ -18,7 +18,7 @@ import {
   import { Ifilter } from '../../assets/icon';
   import BASE_URL from '../../../config'
 
-const KartuStokPage = ({route}) => {
+const KartuStokPage = ({route,navigation}) => {
     const params = route.params.data
     const [Data, setData] = useState([]);
     const [DumyData, setDumyData] = useState([]);
@@ -26,12 +26,13 @@ const KartuStokPage = ({route}) => {
     const [modalVisibleCategory, setModalVisibleCategory] = useState(false);
     const [Datakateogri, setDatakateogri] = useState([]);
     const renderitem = (item) => {
+        
         return (
             <View style={{ marginTop: 18, paddingBottom: 2 }}>
                 <ItemKatalog
                     item={item.item}
                     onPress={() =>
-                        navigation.navigate('detailkartustok', { id: item.item.kode_produk, data: item.item })
+                        navigation.navigate('tabkartu',{item:item.item})
                     }
                 />
             </View>
@@ -45,14 +46,14 @@ const KartuStokPage = ({route}) => {
             // setModalVisibleLoading(true);
             const token = await AsyncStorage.getItem('tokenAccess');
             const [res1, res2] = await Promise.all([
-                axios.get(`${BASE_URL}/produk/${params.data.id_toko}/true`, {
+                axios.get(`${BASE_URL}/produk/1/true`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 }),
                 axios.get(`${BASE_URL}/kategori`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 }),
             ]);
-            console.log(res1.data.data)
+            // console.log(res1.data)
             setData(res1.data.data);
             setDatakateogri(res2.data.data)
             setDumyData(res1.data.data)

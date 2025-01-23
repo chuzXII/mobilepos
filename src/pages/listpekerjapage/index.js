@@ -76,7 +76,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
     const onPressadd = async () => {
         const token = await AsyncStorage.getItem('tokenAccess');
         const response = await axios.post(`${BASE_URL}` + '/pekerja', {
-            id_toko: params.data.data.id_toko,
+            id_toko: params.data.id_toko,
             nama_pekerja: Form.namapekerja,
             alamat_pekerja: Form.alamatpekerja,
             email: Form.email,
@@ -107,7 +107,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
         try {
             const token = await AsyncStorage.getItem('tokenAccess');
             const response = await axios.put(`${BASE_URL}/pekerja/${Form.id}`, {
-                id_toko:params.data.data.id_toko,
+                id_toko:params.data.id_toko,
                 nama_pekerja: Form.namapekerja,
                 alamat_pekerja: Form.alamatpekerja,
                 email: Form.email,
@@ -152,7 +152,7 @@ const ListPekerjaPage = ({ route, navigation }) => {
 
         try {
             const token = await AsyncStorage.getItem('tokenAccess');
-            const response = await axios.get(`${BASE_URL}/pekerja/${params.data.data.id_toko}`, {
+            const response = await axios.get(`${BASE_URL}/pekerja/${params.data.id_toko}`, {
                 headers: {
                     Authorization: 'Bearer ' + token,
                 },

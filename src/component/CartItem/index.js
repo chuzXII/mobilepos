@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 
 
 const CardItem = ({ item }) => {
+  // console.log(item)
   const dispatch = useDispatch()
   const currency = new Intl.NumberFormat('id-ID')
 
@@ -21,15 +22,15 @@ const CardItem = ({ item }) => {
       <View style={styles.container}>
         <View style={styles.box2}>
           <View>
-            {item.item[5] == undefined ? 
-            item.item[1].split(' ').length <= 1 ?
+            {item.item.url_img== null ? 
+            item.item.nama_produk.split(' ').length <= 1 ?
               <View style={styles.productImage}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold', colo: '#151515' }}>{item.item[1].slice(0, 1).toUpperCase() + item.item[1].slice(1, 2).toUpperCase()}</Text>
+                <Text style={{ fontSize: 32, fontWeight: 'bold', colo: '#151515' }}>{item.item.nama_produk.slice(0, 1).toUpperCase() + item.item.nama_produk.slice(1, 2).toUpperCase()}</Text>
               </View> : <View style={styles.productImage}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold' }}>{item.item[1].split(' ')[0].slice(0, 1).toUpperCase() + item.item[1].split(' ')[1].slice(0, 1).toUpperCase()}</Text>
+                <Text style={{ fontSize: 32, fontWeight: 'bold' }}>{item.item.nama_produk.split(' ')[0].slice(0, 1).toUpperCase() + item.item.nama_produk.split(' ')[1].slice(0, 1).toUpperCase()}</Text>
               </View> : <Image
               style={styles.productImage}
-              source={{ uri: item.item[5] }}
+              source={{ uri: item.item.url_img }}
             />
             }
             {/* <Image
@@ -38,9 +39,9 @@ const CardItem = ({ item }) => {
               /> */}
           </View>
           <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <Text style={styles.title}>{item.item[1]}</Text>
+            <Text style={styles.title}>{item.item.nama_produk}</Text>
             <Text style={styles.attribute}>
-              {'1pcs - ' + 'Rp. ' + currency.format(item.item[2])}
+              {'1pcs - ' + 'Rp. ' + currency.format(item.item.harga)}
             </Text>
             <View style={styles.quantitContainer}>
               <TouchableOpacity

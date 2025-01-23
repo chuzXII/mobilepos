@@ -7,6 +7,8 @@ import { color } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
+  const currency = new Intl.NumberFormat('id-ID');
+
   const navigation = useNavigation();
   const [dashboardData, setDashboardData] = useState(null);
   const [tokoList, setTokoList] = useState([]);
@@ -15,7 +17,7 @@ const Home = () => {
   const onPressadd = async () => {
     navigation.navigate('formaddtoko')
   };
-  const onPressedt = (item) => {
+  const onPresstoko = (item) => {
 
     navigation.navigate('tokopage',{data:item});
   };
@@ -74,7 +76,7 @@ const Home = () => {
           </View>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Total Pendapatan</Text>
-            <Text style={styles.cardValue}>Rp {dashboardData.total_pendapatan}</Text>
+            <Text style={styles.cardValue}>Rp {currency.format(dashboardData.total_pendapatan)}</Text>
           </View>
         </>
       )}
@@ -86,7 +88,7 @@ const Home = () => {
         </TouchableOpacity>
       </View>
       {tokoList.map((toko) => (
-        <TouchableOpacity key={toko.id_toko} style={styles.tokoItem} onPress={() => onPressedt(toko)}>
+        <TouchableOpacity key={toko.id_toko} style={styles.tokoItem} onPress={() => onPresstoko(toko)}>
           <Text style={styles.tokoName}>{toko.nama_toko}</Text>
           <Text style={styles.tokoAlamat}>{toko.alamat_toko}</Text>
         </TouchableOpacity>

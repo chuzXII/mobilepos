@@ -55,6 +55,7 @@ const initialStateCart = {
 const CartReducer = (state = initialStateCart, action) => {
 
     if (action.type == 'CART') {
+        // console.log(state.cartitem)
         const isInCart = state.cartitem.some(item => item.id === action.value.id);
 
         if (isInCart) {

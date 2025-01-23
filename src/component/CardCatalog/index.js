@@ -16,16 +16,15 @@ const Cardcatalog = ({ item, oriented }) => {
 
   const TRXReducer = useSelector(state => state.TRXReducer);
 
-  const setCart = (item, idpproduk, count, harga, id_tensaksi) => {
+  const setCart = (item, idpproduk, count, harga) => {
     let ids = '';
-    if (TRXReducer.id_produk == null) {
-      ids = id_tensaksi;
-    } else {
-      ids = TRXReducer.id_produk;
-    }
+    // if (TRXReducer.id_produk == null) {
+    //   ids = id_tensaksi;
+    // } else {
+    //   ids = TRXReducer.id_produk;
+    // }
 
     let cart = {
-      idtrx: ids,
       item: item,
       id: idpproduk,
       count: count,
@@ -39,19 +38,27 @@ const Cardcatalog = ({ item, oriented }) => {
   };
 
   const handdlebutton = () => {
-    const rawdate = new Date();
-    const date = moment(rawdate).format('DD-MM-YY').split('-');
-    const id_tensaksi =
-      'TRX-' +
-      date[0] +
-      date[1] +
-      date[2] +
-      Math.floor(Math.random() * 1000000) + 1;
-    setidproduk(id_tensaksi);
-    let idpproduk = item.idpproduk; // Assuming `idpproduk` is a field in the object
-    let harga = item.harga;
-    let count = 1;
-    setCart(item, idpproduk, count, harga, id_tensaksi);
+    // const rawdate = new Date();
+    // const date = moment(rawdate).format('DD-MM-YY').split('-');
+    // const id_tensaksi =
+    //   'TRX-' +
+    //   date[0] +
+    //   date[1] +
+    //   date[2] +
+    //   Math.floor(Math.random() * 1000000) + 1;
+    // setidproduk(id_tensaksi);
+    // console.log(item)
+    // let idpproduk = item.kode_produk; // Assuming `idpproduk` is a field in the object
+    // let harga = item.harga;
+    // let count = 1;
+    let cart = {
+      item: item,
+      id: item.kode_produk,
+      count: 1,
+      subTotal: item.harga,
+    };
+    dispatch({ type: 'CART', value: cart })
+    // setCart(item, idpproduk, count, harga);
   };
 
   return (
@@ -59,7 +66,7 @@ const Cardcatalog = ({ item, oriented }) => {
       style={styles.wrapCard(oriented)}
       onPress={() => handdlebutton()}>
       <View style={styles.wrapImg(oriented)}>
-        {item.imageUrl == undefined ? (
+        {item.url_img == null ? (
           item.nama_produk.split(' ').length <= 1 ? (
             <View
               style={{
@@ -69,7 +76,7 @@ const Cardcatalog = ({ item, oriented }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#151515' }}>
+              <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#ededed' }}>
                 {item.nama_produk.slice(0, 1).toUpperCase() +
                   item.nama_produk.slice(1, 2).toUpperCase()}
               </Text>
@@ -133,7 +140,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   }),
   wrapImg: (Oriented) => ({
-    width: Oriented == 'portrait' ? Dwidth * 0.455 : Dwidth * 0.48,
+    // width: Oriented == 'portrait' ? Dwidth * 0.455 : Dwidth * 0.48, 
     height: Oriented == 'portrait' ? Dheight * 0.2 : Dheight * 0.28,
   }),
   image: {

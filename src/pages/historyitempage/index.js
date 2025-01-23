@@ -39,11 +39,11 @@ const HistoryItemPage = ({ route, navigation }) => {
 
   const currency = new Intl.NumberFormat('id-ID');
   const isFocused = useIsFocused();
-  const { idtrx } = route.params;
+  const item = route.params;
   const onPressprint = async () => {
     try {
-      await BluetoothEscposPrinter.printText('\r\n\r\n', {});  
-      await BluetoothEscposPrinter.printPic64(chillLogo, {width: 200, height:150});
+      await BluetoothEscposPrinter.printText('\r\n\r\n', {});
+      await BluetoothEscposPrinter.printPic64(chillLogo, { width: 200, height: 150 });
       await BluetoothEscposPrinter.printerAlign(
         BluetoothEscposPrinter.ALIGN.CENTER,
       );
@@ -56,7 +56,7 @@ const HistoryItemPage = ({ route, navigation }) => {
         {},
       );
       await BluetoothEscposPrinter.setBlob(0);
-      
+
       await BluetoothEscposPrinter.printText(
         '================================',
         {},
@@ -103,15 +103,15 @@ const HistoryItemPage = ({ route, navigation }) => {
         {},
       );
       // CartReducer.cartitem.map(async(items,index)=>{
-        
+
       for (const element of Data) {
         const product = element.produk;
         const quantity = element.data[0][2];
         const pricePerUnit = element.data[0][3];
-      
+
         const subtotal = quantity * pricePerUnit;
         const formattedSubtotal = 'Rp.' + currency.format(subtotal);
-      
+
         await BluetoothEscposPrinter.printColumn(
           [32],
           [BluetoothEscposPrinter.ALIGN.LEFT],
@@ -254,102 +254,103 @@ const HistoryItemPage = ({ route, navigation }) => {
   }
 
   const get = async () => {
+    console.log(item.item.item.detail_transaksi)
     const sheetid = await AsyncStorage.getItem('TokenSheet');
     const token = await AsyncStorage.getItem('tokenAccess');
-    setModalVisibleLoading(true);
-    await axios
-      .get(
-        'https://sheets.googleapis.com/v4/spreadsheets/' +
-        sheetid +
-        '/values/Transaksi',
-        {
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        },
-      )
-      .then(res => {
-        const j = res.data.values.filter(fill => fill[0] == idtrx);
-        setDataTotal(j);
-        const srawdate = j[0][5].split(' ');
-        const [day, month, year] = srawdate[0].split('-');
+    // setModalVisibleLoading(true);
+    // await axios
+    //   .get(
+    //     'https://sheets.googleapis.com/v4/spreadsheets/' +
+    //     sheetid +
+    //     '/values/Transaksi',
+    //     {
+    //       headers: {
+    //         Authorization: 'Bearer ' + token,
+    //       },
+    //     },
+    //   )
+    //   .then(res => {
+    //     const j = res.data.values.filter(fill => fill[0] == idtrx);
+    //     setDataTotal(j);
+    //     const srawdate = j[0][5].split(' ');
+    //     const [day, month, year] = srawdate[0].split('-');
 
-        const rawdate = moment(year + '-' + month + '-' + day)
-          .format('DD MMM yyyy')
-          .concat('T' + srawdate[1]);
-        setdataDate(rawdate.split('T'));
-        setTunai(j[0][4]);
-        setIdTrx(j[0][0]);
-        setOwner(j[0][9]);
-        setPesan(j[0][8]);
-        setStatus(j[0][10]);
-        const rawdiskon = j[0][7].split(' ');
-        let Total;
-        const subtotal = j.reduce(
-          (result, item) => parseInt(item[3]) * parseInt(item[2]) + result,
-          0,
-        );
-        if (rawdiskon.length == 1) {
-          setValueDiskon(rawdiskon[0]);
-          Total = (subtotal - rawdiskon[0]);
-        } else {
-          if (rawdiskon[1].split('-').length <= 1) {
-            setValueDiskon(rawdiskon[1].split('-'));
-            Total = (subtotal - rawdiskon[1].split('-')[0])
-          } else {
-           
-            setValueDiskon(rawdiskon[1].split('-'));
-            Total = subtotal - (subtotal * rawdiskon[1].split('-')[0]) / 100;
-          }
+    //     const rawdate = moment(year + '-' + month + '-' + day)
+    //       .format('DD MMM yyyy')
+    //       .concat('T' + srawdate[1]);
+    //     setdataDate(rawdate.split('T'));
+    //     setTunai(j[0][4]);
+    //     setIdTrx(j[0][0]);
+    //     setOwner(j[0][9]);
+    //     setPesan(j[0][8]);
+    //     setStatus(j[0][10]);
+    //     const rawdiskon = j[0][7].split(' ');
+    //     let Total;
+    //     const subtotal = j.reduce(
+    //       (result, item) => parseInt(item[3]) * parseInt(item[2]) + result,
+    //       0,
+    //     );
+    //     if (rawdiskon.length == 1) {
+    //       setValueDiskon(rawdiskon[0]);
+    //       Total = (subtotal - rawdiskon[0]);
+    //     } else {
+    //       if (rawdiskon[1].split('-').length <= 1) {
+    //         setValueDiskon(rawdiskon[1].split('-'));
+    //         Total = (subtotal - rawdiskon[1].split('-')[0])
+    //       } else {
 
-        }
+    //         setValueDiskon(rawdiskon[1].split('-'));
+    //         Total = subtotal - (subtotal * rawdiskon[1].split('-')[0]) / 100;
+    //       }
+
+    //     }
 
 
-        setSubTotal(subtotal);
-        setTotal(Total);
+    //     setSubTotal(subtotal);
+    //     setTotal(Total);
 
-        let result = [];
-        j.forEach(
-          (indices => v => {
-            if (v in indices) result[indices[v]]++;
-            else indices[v] = result.push(1) - 1;
-          })({}),
-        );
-        const groups = j.reduce((groups, data) => {
-          const produk = data[1];
-          if (!groups[produk]) {
-            groups[produk] = [];
-          }
-          groups[produk].push(data);
-          return groups;
-        }, {});
-        const groupArrays = Object.keys(groups).map(produk => {
-          return {
-            produk,
-            data: groups[produk],
-          };
-        });
-        setData(groupArrays);
-        setModalVisibleLoading(false);
-      })
-      .catch(error => {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-          alert(error.message);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
-        }
-      });
+    //     let result = [];
+    //     j.forEach(
+    //       (indices => v => {
+    //         if (v in indices) result[indices[v]]++;
+    //         else indices[v] = result.push(1) - 1;
+    //       })({}),
+    //     );
+    //     const groups = j.reduce((groups, data) => {
+    //       const produk = data[1];
+    //       if (!groups[produk]) {
+    //         groups[produk] = [];
+    //       }
+    //       groups[produk].push(data);
+    //       return groups;
+    //     }, {});
+    //     const groupArrays = Object.keys(groups).map(produk => {
+    //       return {
+    //         produk,
+    //         data: groups[produk],
+    //       };
+    //     });
+    //     setData(groupArrays);
+    //     setModalVisibleLoading(false);
+    //   })
+    //   .catch(error => {
+    //     if (error.response) {
+    //       // The request was made and the server responded with a status code
+    //       // that falls out of the range of 2xx
+    //       console.log(error.response.data);
+    //       console.log(error.response.status);
+    //       console.log(error.response.headers);
+    //     } else if (error.request) {
+    //       // The request was made but no response was received
+    //       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+    //       // http.ClientRequest in node.js
+    //       console.log(error.request);
+    //       alert(error.message);
+    //     } else {
+    //       // Something happened in setting up the request that triggered an Error
+    //       console.log('Error', error.message);
+    //     }
+    //   });
   };
   useEffect(() => {
     get();
@@ -360,8 +361,6 @@ const HistoryItemPage = ({ route, navigation }) => {
         <View style={{ marginHorizontal: 14 }}>
           <ViewShot ref={(ref) => (fakturContainer = ref)}>
             <View style={{ backgroundColor: '#fff' }}>
-
-
               <View
                 style={{
                   flexDirection: 'row',
@@ -371,28 +370,30 @@ const HistoryItemPage = ({ route, navigation }) => {
                 }}>
                 <View>
                   <Text style={{ color: '#000', fontFamily: 'InknutAntiqua-Regular' }}>
-                    {idtrx}
+                    {item.item.item.id_transaksi}
                   </Text>
                   <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
-                    {dataDate[0] + ' ' + dataDate[1]}
+           
+                    {moment(item.item.item.created_at).format('DD MMM yyyy HH:mm:ss')}
                   </Text>
                 </View>
                 <View>
                   <Text style={{ color: '#000', fontFamily: 'InknutAntiqua-Regular' }}>
                     Rp.
-                    {currency.format(Total)}
+                    {currency.format(item.item.item.totalharga)}
                   </Text>
                   <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Light' }}>
                     {Owner}
                   </Text>
                 </View>
               </View>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold', paddingTop: 6, fontSize: 16 }}>Catatan :</Text>
-              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular', paddingTop: 4, paddingBottom: 16, fontSize: 14 }}>{Pesan}</Text>
+              {/* <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold', paddingTop: 6, fontSize: 16 }}>Catatan :</Text>
+              <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular', paddingTop: 4, paddingBottom: 16, fontSize: 14 }}>{Pesan}</Text> */}
 
 
               <View
                 style={{
+                  marginVertical:12,
                   borderStyle: 'dashed',
                   borderBottomWidth: 1,
                   borderColor: '#C3C3C3',
@@ -400,12 +401,12 @@ const HistoryItemPage = ({ route, navigation }) => {
               <View
                 style={{
                   backgroundColor: '#EEFFFC',
-                  marginTop: 22,
+           
                   paddingVertical: 16,
                   borderRadius: 8,
                 }}>
                 <View style={{ marginHorizontal: 14 }}>
-                  {DataTotal.map((item, index) => {
+                  {item.item.item.detail_transaksi.map((item, index) => {
                     return (
                       <View
                         style={{
@@ -428,7 +429,7 @@ const HistoryItemPage = ({ route, navigation }) => {
                               fontFamily: 'TitilliumWeb-Regular',
                             }}>
 
-                            {item[1]}
+                            {item.produk.nama_produk}
                           </Text>
                           <View style={{
                             flexDirection: 'row',
@@ -442,13 +443,13 @@ const HistoryItemPage = ({ route, navigation }) => {
                                   color: '#000',
                                   fontFamily: 'TitilliumWeb-Regular',
                                 }}>
-                                {item[2]}x Rp.{item[3]}
+                                {item.qty}x Rp.{currency.format(item.harga)}
                               </Text>
                             </View>
                             <View>
                               <Text
                                 style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-                                Rp.{currency.format(parseInt(item[3]) * item[2])}
+                                Rp.{currency.format(item.subtotal)}
                               </Text>
                             </View>
                           </View>
@@ -469,15 +470,15 @@ const HistoryItemPage = ({ route, navigation }) => {
                     }}></View>
                   <View
                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
-                      Subtotal
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
+                      Total
                     </Text>
-                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
+                    <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
                       Rp.
-                      {currency.format(SubTotal)}
+                      {currency.format(item.item.item.totalharga)}
                     </Text>
                   </View>
-                  <View
+                  {/* <View
                     style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Regular' }}>
                       Diskon
@@ -491,10 +492,10 @@ const HistoryItemPage = ({ route, navigation }) => {
                         {ValueDiskon}
                       </Text>}
 
-                  </View>
+                  </View> */}
                 </View>
               </View>
-              <View
+              {/* <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
@@ -509,16 +510,17 @@ const HistoryItemPage = ({ route, navigation }) => {
                   Rp.
                   {currency.format(Total)}
                 </Text>
-              </View>
+              </View> */}
               <View
                 style={{
+                  marginVertical:12,
                   borderStyle: 'dashed',
                   borderBottomWidth: 1,
                   borderColor: '#C3C3C3',
                 }}></View>
               <View
                 style={{
-                  marginTop: 12,
+                  
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   marginHorizontal: 14,
@@ -527,7 +529,7 @@ const HistoryItemPage = ({ route, navigation }) => {
                   Tunai
                 </Text>
                 <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                  Rp.{currency.format(Tunai)}
+                  Rp.{currency.format(item.item.item.pembayaran)}
                 </Text>
               </View>
               <View
@@ -541,7 +543,7 @@ const HistoryItemPage = ({ route, navigation }) => {
                   Kembalian
                 </Text>
                 <Text style={{ color: '#000', fontFamily: 'TitilliumWeb-Bold' }}>
-                  Rp.{currency.format(Tunai - Total)}
+                  Rp.{currency.format(item.item.item.kembalian)}
                 </Text>
               </View>
             </View>
@@ -577,7 +579,7 @@ const HistoryItemPage = ({ route, navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          {Status == 'Refund' ? null : <TouchableOpacity
+          {/* {Status == 'Refund' ? null : <TouchableOpacity
             onPress={() => onPressrefund()}
             style={{
               marginHorizontal: 26,
@@ -592,7 +594,7 @@ const HistoryItemPage = ({ route, navigation }) => {
             <Text style={{ color: '#CB0000', fontFamily: 'TitilliumWeb-Bold' }}>
               Refund
             </Text>
-          </TouchableOpacity>}
+          </TouchableOpacity>} */}
 
           {/* <TouchableOpacity onPress={() => onPressKirim()}>
           <Text style={{color: '#000'}}>Kirim</Text>

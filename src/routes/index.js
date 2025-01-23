@@ -2,7 +2,7 @@ import { BackHandler, StyleSheet, Text, TouchableOpacity, View } from 'react-nat
 import React, { useEffect, useState } from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Formkasir from '../pages/formkasir';
-import Dashboard from '../pages/dashboard';
+// import Dashboard from '../pages/dashboard';
 import { useNavigation } from '@react-navigation/native';
 import Cartpage from '../pages/cartpage';
 import Setupage from '../pages/setup';
@@ -42,6 +42,9 @@ import KartuStokPage from '../pages/kartustokpage';
 import DetailKartuStok from '../pages/detailkartustok';
 import DetailOpname from '../detailopname';
 import OpnamePage from '../pages/opnamepage';
+import TransaksiPage from '../pages/transaksi';
+import RegisterPage from '../pages/registerpage';
+import Cardkartu from '../component/Cardkartu';
 
 
 
@@ -102,23 +105,17 @@ const Routes = ({ navigation }) => {
         <Drawer.Screen name='kategori' component={KategoriPage} options={{ title: 'Kategori', drawerIcon: ({ focused, size }) => (<Ilist />) }} />
         {/* <Drawer.Screen name='toko' component={TokoPage} options={{ title: 'Toko', drawerIcon: ({ focused, size }) => (<Ilist />) }} /> */}
 
-        <Drawer.Screen name='historypage' component={HistoryPage}
-          options={({ navigation }) => ({
-            title: 'Riwayat Transaksi', drawerIcon: ({ focused, size }) => (<Ihistory />), headerRight: () => (
-              <TouchableOpacity onPress={() => navigations.navigate('SetupPrinter')} style={{ alignItems: 'center', justifyContent: 'center', marginRight: 12, borderWidth: 1, borderRadius: 20, padding: 4 }}>
-                <Isprint />
-              </TouchableOpacity>)
-          })} />
+        {/*   */}
         {/* <Drawer.Screen name='diskonpage' component={DiskonPage} options={{ title: 'Diskon', drawerIcon: ({ focused, size }) => (<Idiskon />) }} /> */}
         {/* <Drawer.Screen name='pengeluaranpage' component={PengeluaranPage} options={{ title: 'Pengeluaran', drawerIcon: ({ focused, size }) => (<Ilist />) }} /> */}
         {/* <Drawer.Screen name='toptab' component={Toptab} options={{ headerShown: false, title: 'Statistik', drawerIcon: ({ focused, size }) => (<Ichart />) }} /> */}
         {/* <Drawer.Screen name='setupage' component={Setupage} options={{ title: 'Setup Spreedsheet', headerShown: false, drawerIcon: ({ focused, size }) => (<Isexcel />) }} /> */}
         <Drawer.Screen name='SetupPrinter' component={SetupPrinter} options={{ title: 'Setup Printer', headerShown: false, drawerIcon: ({ focused, size }) => (<Isprint />) }} />
-
         {/* <Drawer.Screen name='aboutpage' component={AboutPage} options={{ title: 'About', headerShown: false, drawerIcon: ({ focused, size }) => (<Iabout />) }} /> */}
       </Drawer.Navigator>
     )
   }
+
   const Toptab = () => {
     return (
       <Tab.Navigator screenOptions={{
@@ -127,6 +124,21 @@ const Routes = ({ navigation }) => {
       }}>
         <Tab.Screen name="charttransaksi" component={ChartTransaksi} options={{ tabBarLabel: 'Statistik Pemasukan' }} />
         <Tab.Screen name="chartpengeluaran" component={ChartPengeluaran} options={{ tabBarLabel: 'Statistik Pengeluaran' }} />
+      </Tab.Navigator>
+    )
+  }
+  const Tabkartustok = ({ route }) => {
+    const { item } = route.params;
+    return (
+      <Tab.Navigator screenOptions={{
+        tabBarScrollEnabled: true,
+        tabBarActiveTintColor: 'blue',
+        tabBarInactiveTintColor: 'gray', // Enable scroll for tabs
+      }}>
+        <Tab.Screen name="Semua" component={Cardkartu} initialParams={{ item, type: 'all' }} />
+        <Tab.Screen name="Masuk" component={Cardkartu} initialParams={{ item, type: 'masuk' }} />
+        <Tab.Screen name="Keluar" component={Cardkartu} initialParams={{ item, type: 'keluar' }} />
+        <Tab.Screen name="Penyesuaian" component={Cardkartu} initialParams={{ item, type: 'penyesuaian' }} />
       </Tab.Navigator>
     )
   }
@@ -155,16 +167,25 @@ const Routes = ({ navigation }) => {
       {/* <Stack.Screen name='setupage' component={Setupage} /> */}
       <Stack.Screen name='cartpage' component={Cartpage} options={{ title: 'Keranjang' }} />
       <Stack.Screen name='historyitempage' component={HistoryItemPage} options={{ title: 'Detail History' }} />
+      <Stack.Screen name='historypage' component={HistoryPage} options={{ title: 'Riwayat Transaksi' }} />
+
       {/* <Stack.Screen name='formdiskon' component={FormDiskon} options={{ title: 'Tambah Diskon' }} /> */}
       <Stack.Screen name='formedit' component={FormEdit} options={{ title: 'Edit Menu' }} />
       <Stack.Screen name='finalpage' component={FinalPage} options={{ headerShown: false }} />
       <Stack.Screen name='listkatalog' component={ListKatalog} options={{ headerShown: true }} />
       <Stack.Screen name='listpekerja' component={ListPekerjaPage} options={{ headerShown: true }} />
-      <Stack.Screen name='dashboard' component={Dashboard} options={{ headerShown: true }} />
+      <Stack.Screen name='transaksi' component={TransaksiPage} options={{ headerShown: true }} />
       <Stack.Screen name='kartustok' component={KartuStokPage} options={{ headerShown: true }} />
       <Stack.Screen name='detailkartustok' component={DetailKartuStok} options={{ headerShown: true }} />
       <Stack.Screen name='detailopname' component={DetailOpname} options={{ headerShown: true }} />
       <Stack.Screen name='opnamepage' component={OpnamePage} options={{ headerShown: true }} />
+      <Stack.Screen name='regis' component={RegisterPage} options={{ headerShown: false }} />
+      <Stack.Screen name='tabkartu' component={Tabkartustok} options={({ route }) => ({
+        headerShown: true,
+        title: route.params?.item.nama_produk || 'Default Title', // Use the route parameter for title
+      })} />
+
+
     </Stack.Navigator>
 
   )

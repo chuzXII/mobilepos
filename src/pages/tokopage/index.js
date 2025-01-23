@@ -9,19 +9,22 @@ const TokoPage = ({ route }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const onPressPrdouk = () => {
-    navigation.navigate('listkatalog', { data: data })
+    navigation.navigate('listkatalog', data )
   }
   const onPressPekerja = () => {
-    navigation.navigate('listpekerja', { data: data })
+    navigation.navigate('listpekerja', data )
   }
   const onPressTransaksi = () => {
-    navigation.navigate('dashboard', { data: data })
+    navigation.navigate('transaksi',  data )
   }
   const onPressOpname = () => {
-    navigation.navigate('opnamepage', { data: data })
+    navigation.navigate('opnamepage',  data )
   }
   const onPressKartustok = () => {
-    navigation.navigate('kartustok', { data: data })
+    navigation.navigate('kartustok', data )
+  }
+  const onPressRiwayatTransaksi = () => {
+    navigation.navigate('historypage', data )
   }
   return (
     <View style={styles.container}>
@@ -46,7 +49,10 @@ const TokoPage = ({ route }) => {
         <Text style={styles.cardTitle}>Transaksi</Text>
         <Text style={{ color: "#000" }}>Proses transaksi di sini.</Text>
       </TouchableOpacity>
-
+      <TouchableOpacity style={styles.card} onPress={() => { onPressRiwayatTransaksi() }}>
+        <Text style={styles.cardTitle}>Riwayat Transaksi</Text>
+        <Text style={{ color: "#000" }}>Riwayat transaksi di sini.</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.card} onPress={() => { onPressOpname() }}>
         <Text style={styles.cardTitle}>Stok Opname</Text>
         <Text style={{ color: "#000" }}>Lakukan pengecekan stok di sini.</Text>
